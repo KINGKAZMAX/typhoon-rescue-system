@@ -86,7 +86,7 @@ async function main() {
       '--disable-background-networking',
       '--disable-features=Translate,BackForwardCache',
       '--run-all-compositor-stages-before-draw',
-      '--force-device-scale-factor=1',
+      `--force-device-scale-factor=${process.env.OVERVIEW_SCALE || '2'}`,
       '--window-size=3600,5600',
       '--virtual-time-budget=16000',
       `--screenshot=${topLevelPng}`,
