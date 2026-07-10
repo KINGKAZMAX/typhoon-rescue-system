@@ -1,9 +1,22 @@
 // 台风/洪涝灾后安全与重建指南 — 完整来源见 research/03-灾后重建与安全指南.md
 // 科普性质；涉及房屋结构、电气、燃气的专业判断务必以持证专业人员现场意见为准。
 
+import type { LucideIcon } from 'lucide-react'
+import {
+  House,
+  Zap,
+  Flame,
+  Droplets,
+  Biohazard,
+  Shovel,
+  Mountain,
+  HeartPulse,
+  ClipboardList,
+} from 'lucide-react'
+
 export interface GuideSection {
   id: string
-  icon: string
+  icon: LucideIcon
   title: string
   principle: string
   items: string[]
@@ -13,7 +26,7 @@ export interface GuideSection {
 export const guideSections: GuideSection[] = [
   {
     id: 'house',
-    icon: '🏚️',
+    icon: House,
     title: '返家前 · 房屋安全检查',
     principle: '先评估、后进屋；不确定，不入住。房屋是否安全应由专业人员判定。',
     items: [
@@ -31,7 +44,7 @@ export const guideSections: GuideSection[] = [
   },
   {
     id: 'power',
-    icon: '⚡',
+    icon: Zap,
     title: '用电安全',
     principle: '断电 — 干燥 — 专业检修，切勿急于通电。',
     items: [
@@ -50,12 +63,12 @@ export const guideSections: GuideSection[] = [
   },
   {
     id: 'gas',
-    icon: '🔥',
+    icon: Flame,
     title: '燃气与用火安全',
     principle: '泡水燃气设施先关阀、先通风，任何异常都请燃气公司检修后再用。',
     items: [
       '燃气表/阀门/软管/灶具泡水后可能腐蚀失效，未经检查合格前不要使用。',
-      '闻到臭鸡蛋味（泄漏信号）→ 三步走：① 开门开窗通风；② 关燃气具开关和表前阀门、杜绝一切火源；③ 人撤到室外再拨燃气公司报修。',
+      '闻到臭鸡蛋味（泄漏信号）→ 三步走：(1) 开门开窗通风；(2) 关燃气具开关和表前阀门、杜绝一切火源；(3) 人撤到室外再拨燃气公司报修。',
       '用皂液涂抹接口检漏：冒泡即漏气（需在无明火、通风条件下）。',
       '灾后是火灾高发期，用电前务必检修；用火做到"人走火熄、关阀断气"。',
     ],
@@ -66,7 +79,7 @@ export const guideSections: GuideSection[] = [
   },
   {
     id: 'water',
-    icon: '💧',
+    icon: Droplets,
     title: '饮水与食品安全',
     principle: '不喝生水、不吃泡水食物；"病从口入"是灾后头号健康威胁。',
     items: [
@@ -84,7 +97,7 @@ export const guideSections: GuideSection[] = [
   },
   {
     id: 'epidemic',
-    icon: '🦠',
+    icon: Biohazard,
     title: '卫生防疫',
     principle: '大灾之后防大疫。灾后 7~15 天是肠道/虫媒传染病高发窗口。',
     items: [
@@ -101,7 +114,7 @@ export const guideSections: GuideSection[] = [
   },
   {
     id: 'cleanup',
-    icon: '🧹',
+    icon: Shovel,
     title: '清淤与清理',
     principle: '先做好个人防护，再动手清理；先清洁、后消毒。',
     items: [
@@ -117,7 +130,7 @@ export const guideSections: GuideSection[] = [
   },
   {
     id: 'secondary',
-    icon: '⛰️',
+    icon: Mountain,
     title: '次生灾害防范',
     principle: '台风过后未"警报解除"，滑坡、泥石流、内涝、蛇虫风险仍在持续。',
     items: [
@@ -134,7 +147,7 @@ export const guideSections: GuideSection[] = [
   },
   {
     id: 'mental',
-    icon: '💚',
+    icon: HeartPulse,
     title: '心理健康',
     principle: '灾后恐惧、失眠、易怒、麻木是正常应激反应；持续或严重时主动求助，别硬扛。',
     items: [
@@ -149,13 +162,13 @@ export const guideSections: GuideSection[] = [
   },
   {
     id: 'rebuild',
-    icon: '📋',
+    icon: ClipboardList,
     title: '重建与理赔',
     principle: '因灾倒损住房恢复重建遵循"自主申请、不建不补、发放到户"。',
     items: [
       '重建救助申请：以家庭为单位，户主向村（居）委会书面申请 → 民主评议 → 张榜公示 → 补助发放到户。',
       '保留房屋受损照片、受灾证明，按当地要求参加评议公示。',
-      '保险理赔三步：① 第一时间拍照录像留证；② 24 小时内拨保险公司客服/App 报案；③ 配合查勘定损。',
+      '保险理赔三步：(1) 第一时间拍照录像留证；(2) 24 小时内拨保险公司客服/App 报案；(3) 配合查勘定损。',
       '家财险：房屋主体破损、装修泡水、家电报废可赔；违建/临时搭建不在保障范围。',
       '农业保险：农作物绝收、大棚灌溉设施冲毁、养殖损失可能在赔付范围，尽快经村委会联系保险公司。',
     ],
@@ -166,13 +179,13 @@ export const guideSections: GuideSection[] = [
   },
 ]
 
-export const quickChecklist: { icon: string; text: string }[] = [
-  { icon: '🏚️', text: '进屋前：承重墙裂缝 > 10mm/地基沉陷/倾斜 → 撤离报鉴定；先断电、关燃气阀、通风。' },
-  { icon: '⚡', text: '通电：断电→干燥→专业检修；泡水家电别"擦干就用"；救触电者先断电。' },
-  { icon: '🔥', text: '燃气：闻到臭鸡蛋味→开窗、关阀、撤人、室外报修；不点火、不开关电器、不按门铃。' },
-  { icon: '💧', text: '饮食：只喝煮沸≥3分钟的水；泡水食物、淹死畜禽一律不吃。' },
-  { icon: '🦠', text: '防疫：有伤口不下水；受伤 24 小时内补种破伤风；物表消毒有效氯 500mg/L。' },
-  { icon: '🧹', text: '清淤：戴口罩手套护目镜穿雨鞋；含氯消毒剂不与洁厕灵混用。' },
-  { icon: '⛰️', text: '次生灾害：泥石流往两侧山坡爬高；不蹚不明积水；服从撤离不返危房。' },
-  { icon: '📋', text: '理赔：先拍照录像→24 小时内报案→泡水车别二次点火。' },
+export const quickChecklist: { icon: LucideIcon; text: string }[] = [
+  { icon: House, text: '进屋前：承重墙裂缝 > 10mm/地基沉陷/倾斜 → 撤离报鉴定；先断电、关燃气阀、通风。' },
+  { icon: Zap, text: '通电：断电→干燥→专业检修；泡水家电别"擦干就用"；救触电者先断电。' },
+  { icon: Flame, text: '燃气：闻到臭鸡蛋味→开窗、关阀、撤人、室外报修；不点火、不开关电器、不按门铃。' },
+  { icon: Droplets, text: '饮食：只喝煮沸≥3分钟的水；泡水食物、淹死畜禽一律不吃。' },
+  { icon: Biohazard, text: '防疫：有伤口不下水；受伤 24 小时内补种破伤风；物表消毒有效氯 500mg/L。' },
+  { icon: Shovel, text: '清淤：戴口罩手套护目镜穿雨鞋；含氯消毒剂不与洁厕灵混用。' },
+  { icon: Mountain, text: '次生灾害：泥石流往两侧山坡爬高；不蹚不明积水；服从撤离不返危房。' },
+  { icon: ClipboardList, text: '理赔：先拍照录像→24 小时内报案→泡水车别二次点火。' },
 ]

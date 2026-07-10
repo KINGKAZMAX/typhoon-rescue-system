@@ -14,9 +14,11 @@ body,
 
 body {
   margin: 0;
-  background: #eef1f5;
-  color: #1f2937;
+  background: #f1f5f9; /* slate-100 */
+  color: #1e293b; /* slate-800 */
+  font-feature-settings: 'tnum' 1;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;
 }
@@ -26,47 +28,66 @@ body {
   max-width: 480px;
   margin: 0 auto;
   min-height: 100%;
-  background: #f7f8fa;
+  background: #f8fafc; /* slate-50 */
   position: relative;
-  box-shadow: 0 0 40px rgba(0, 0, 0, 0.06);
+  border-left: 1px solid #e2e8f0;
+  border-right: 1px solid #e2e8f0;
 }
 
-/* 底部安全区（iPhone 刘海屏 / 手势条） */
 .safe-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* 顶部安全区叠加基础留白（无刘海时仍保留 0.75rem，不被 unlayered 覆盖） */
+/* 顶部安全区叠加基础留白 */
 .pt-safe {
-  padding-top: calc(env(safe-area-inset-top, 0px) + 0.75rem);
+  padding-top: calc(env(safe-area-inset-top, 0px) + 0.875rem);
 }
 
 @layer components {
   .card {
-    @apply bg-white rounded-2xl shadow-sm border border-gray-100;
+    @apply bg-white rounded-2xl border border-slate-200/80 shadow-card;
   }
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl font-medium
-           px-4 py-3 text-base active:scale-[0.98] transition select-none;
-  }
-  .btn-danger {
-    @apply btn bg-danger-600 text-white active:bg-danger-700;
+    @apply inline-flex items-center justify-center gap-1.5 rounded-xl font-medium
+           px-4 py-2.5 text-sm leading-none select-none
+           transition active:scale-[0.98]
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-brand-400;
   }
   .btn-brand {
     @apply btn bg-brand-600 text-white active:bg-brand-700;
   }
+  .btn-danger {
+    @apply btn bg-danger-600 text-white active:bg-danger-700 focus-visible:ring-danger-400;
+  }
   .btn-ghost {
-    @apply btn bg-gray-100 text-gray-700 active:bg-gray-200;
+    @apply btn bg-slate-100 text-slate-700 active:bg-slate-200 focus-visible:ring-slate-300;
+  }
+  .btn-outline {
+    @apply btn bg-white text-slate-700 border border-slate-200 active:bg-slate-50 focus-visible:ring-slate-300;
   }
   .badge {
     @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium;
   }
   .section-title {
-    @apply text-base font-bold text-gray-900 flex items-center gap-2;
+    @apply text-[15px] font-semibold text-slate-900 tracking-tight flex items-center gap-2;
+  }
+  /* 统一表单控件（≥16px 防 iOS 聚焦缩放） */
+  .field {
+    @apply w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-base text-slate-800
+           placeholder:text-slate-400
+           focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100;
+  }
+  .chip {
+    @apply shrink-0 rounded-full px-3 py-1.5 text-sm border transition;
+  }
+  .chip-on {
+    @apply bg-brand-600 text-white border-brand-600;
+  }
+  .chip-off {
+    @apply bg-white text-slate-600 border-slate-200 active:bg-slate-50;
   }
 }
 
-/* 隐藏横向滚动条但保留可滑动（城市 chips） */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }

@@ -10,9 +10,9 @@
 export type VerifyLevel = 'verified' | 'structural' | 'media' | 'unverified'
 
 export const verifyMeta: Record<VerifyLevel, { label: string; cls: string }> = {
-  verified: { label: '✓ 已核实', cls: 'bg-safe-100 text-safe-700' },
-  structural: { label: '✓ 全区统一', cls: 'bg-safe-100 text-safe-700' },
-  media: { label: '官方媒体核实', cls: 'bg-brand-100 text-brand-700' },
+  verified: { label: '已核实', cls: 'bg-safe-100 text-safe-700' },
+  structural: { label: '全区统一', cls: 'bg-safe-100 text-safe-700' },
+  media: { label: '媒体核实', cls: 'bg-brand-100 text-brand-700' },
   unverified: { label: '待核实', cls: 'bg-warn-100 text-warn-700' },
 }
 

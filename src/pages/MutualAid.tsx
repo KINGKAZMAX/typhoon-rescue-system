@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { HeartHandshake, FlaskConical, Dna, MapPin, Phone, CheckCircle2, Plus, ExternalLink, Heart, ShieldCheck, AlertTriangle } from 'lucide-react'
 import PageHeader from '../components/PageHeader'
 import Disclaimer from '../components/Disclaimer'
 import VerifyBadge from '../components/VerifyBadge'
@@ -26,7 +27,7 @@ import Finder from './aid/Finder'
 const cityNames = cities.map((c) => c.name)
 type Tab = 'help' | 'sos' | 'stations' | 'rare' | 'safe' | 'volunteer' | 'donate'
 const TABS: [Tab, string][] = [
-  ['sos', '🆘 拍照求助'],
+  ['sos', '拍照求助'],
   ['help', '求助墙'],
   ['safe', '报平安/寻人'],
   ['stations', '物资/安置'],
@@ -45,15 +46,15 @@ export default function MutualAid() {
     <div>
       {/* header 与二级 Tab 作为一个整体吸顶，避免硬编码偏移导致遮挡 */}
       <div className="sticky top-0 z-30">
-        <PageHeader title="🤝 求助与互助" subtitle="拍照求助 · 物资安置 · 罕见病 · 志愿报名 · 捐赠" />
+        <PageHeader icon={HeartHandshake} title="求助与互助" subtitle="拍照求助 · 物资安置 · 罕见病 · 志愿报名 · 捐赠" />
         {/* 二级 Tab（横向可滚动） */}
-        <div className="bg-white border-b border-gray-100 flex overflow-x-auto no-scrollbar">
+        <div className="bg-white border-b border-slate-100 flex overflow-x-auto no-scrollbar">
           {TABS.map(([k, label]) => (
             <button
               key={k}
               onClick={() => setTab(k)}
               className={`shrink-0 whitespace-nowrap px-4 py-3 text-sm font-medium border-b-2 transition ${
-                tab === k ? 'border-brand-600 text-brand-700' : 'border-transparent text-gray-400'
+                tab === k ? 'border-brand-600 text-brand-700' : 'border-transparent text-slate-400'
               }`}
             >
               {label}
@@ -107,13 +108,14 @@ function HelpWall() {
     <div className="space-y-3">
       {demo && (
         <Disclaimer>
-          🧪 <b>演示模式</b>：后端（Supabase）未配置，下列为示例数据，提交仅本机可见。配置后端后可多人实时共享求助信息。
+          <FlaskConical className="inline h-3.5 w-3.5 -mt-0.5 mr-1 text-slate-500" strokeWidth={2.25} />
+          <b>演示模式</b>：后端（Supabase）未配置，下列为示例数据，提交仅本机可见。配置后端后可多人实时共享求助信息。
         </Disclaimer>
       )}
       <div className="flex items-center justify-between">
-        <span className="text-sm text-gray-500">{loading ? '加载中…' : `共 ${list.length} 条求助`}</span>
+        <span className="text-sm text-slate-500">{loading ? '加载中…' : `共 ${list.length} 条求助`}</span>
         <button onClick={() => setShowForm((v) => !v)} className="btn-brand !py-2 !px-3 text-sm">
-          {showForm ? '收起' : '＋ 发布求助'}
+          {showForm ? '收起' : <><Plus className="h-4 w-4" strokeWidth={2.25} />发布求助</>}
         </button>
       </div>
 
@@ -135,15 +137,16 @@ function HelpWall() {
                     <span className={`badge font-semibold ${URGENCY_META[r.urgency].cls}`}>{URGENCY_META[r.urgency].label}</span>
                   )}
                   <span className="badge bg-danger-50 text-danger-700 font-semibold">{r.type}</span>
-                  {r.rareDisease && <span className="badge bg-brand-100 text-brand-700">🧬 罕见病</span>}
+                  {r.rareDisease && <span className="badge bg-brand-100 text-brand-700 inline-flex items-center gap-1"><Dna className="h-3.5 w-3.5" strokeWidth={2.25} />罕见病</span>}
                 </div>
-                <span className="text-[11px] text-gray-400">{timeAgo(r.created_at)}</span>
+                <span className="text-[11px] text-slate-400">{timeAgo(r.created_at)}</span>
               </div>
-              <p className="text-sm text-gray-800 mt-2 leading-relaxed whitespace-pre-line">{r.detail}</p>
+              <p className="text-sm text-slate-800 mt-2 leading-relaxed whitespace-pre-line">{r.detail}</p>
               <div className="flex items-center justify-between mt-2 gap-2">
-                <span className="text-xs text-gray-500 min-w-0 truncate">
-                  {r.city ? `📍${r.city}` : ''}{r.people ? ` · ${r.people}人` : ''}{r.name ? ` · ${r.name}` : ''}
-                  {` · 📞${maskPhone(r.phone)}`}
+                <span className="text-xs text-slate-500 min-w-0 truncate inline-flex items-center gap-0.5">
+                  {r.city && <><MapPin className="h-3.5 w-3.5 shrink-0" strokeWidth={2.25} />{r.city}</>}
+                  {r.people ? ` · ${r.people}人` : ''}{r.name ? ` · ${r.name}` : ''}
+                  {' · '}<Phone className="h-3.5 w-3.5 shrink-0" strokeWidth={2.25} />{maskPhone(r.phone)}
                 </span>
                 <div className="flex items-center gap-1.5 shrink-0">
                   {!rescued && !claimed && (
@@ -153,12 +156,12 @@ function HelpWall() {
                   )}
                   {claimed && r.phone && (
                     <a href={`tel:${r.phone.replace(/\s/g, '')}`} className="btn-danger !py-1 !px-2.5 text-xs">
-                      📞 拨打
+                      <Phone className="h-3.5 w-3.5" strokeWidth={2.25} />拨打
                     </a>
                   )}
                   {claimed && (
                     <button onClick={() => setStatus(r.id, 'rescued')} className="btn-ghost !py-1 !px-2.5 text-xs">
-                      ✅ 已解决
+                      <CheckCircle2 className="h-3.5 w-3.5" strokeWidth={2.25} />已解决
                     </button>
                   )}
                 </div>
@@ -167,7 +170,7 @@ function HelpWall() {
           )
         })}
       </div>
-      <p className="text-[11px] text-gray-500 leading-relaxed pt-1">
+      <p className="text-[11px] text-slate-500 leading-relaxed pt-1">
         工单流程：待对接 → 对接中 → 已解决。认领后方可拨打完整电话（抑制重复救援、防隐私裸奔）。生命危急请第一时间拨 110/119/120，请勿在求助内容里填写过多敏感个人信息。
       </p>
     </div>
@@ -305,15 +308,15 @@ function VolunteerForm() {
         <div className="space-y-2">
           {volunteerChannels.map((o) => (
             <a key={o.name} href={o.url} target="_blank" rel="noreferrer" className="card p-3 flex items-center gap-3">
-              <span className="text-xl">🔗</span>
+              <span className="grid place-items-center h-10 w-10 rounded-xl bg-brand-50 text-brand-600 shrink-0"><ExternalLink className="h-5 w-5" strokeWidth={2} /></span>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold text-gray-900">{o.name}</span>
+                  <span className="font-semibold text-slate-900">{o.name}</span>
                   <VerifyBadge level={o.verify} />
                 </div>
-                <p className="text-xs text-gray-500 mt-0.5 leading-snug">{o.desc}</p>
+                <p className="text-xs text-slate-500 mt-0.5 leading-snug">{o.desc}</p>
               </div>
-              <span className="text-gray-300">›</span>
+              <span className="text-slate-300">›</span>
             </a>
           ))}
         </div>
@@ -323,12 +326,12 @@ function VolunteerForm() {
         <h2 className="section-title mb-2">在本平台登记（供组织方联系）</h2>
         {done ? (
           <div className="card p-4 text-center">
-            <div className="text-3xl">✅</div>
-            <p className="font-semibold text-gray-900 mt-2">报名信息已提交，感谢你！</p>
-            <p className="text-xs text-gray-500 mt-1">
+            <CheckCircle2 className="h-9 w-9 mx-auto text-safe-600" strokeWidth={2} />
+            <p className="font-semibold text-slate-900 mt-2">报名信息已提交，感谢你！</p>
+            <p className="text-xs text-slate-500 mt-1">
               {demo ? '（演示模式：后端未配置，信息未真正入库。）' : '组织方将根据需要与你联系。'}
             </p>
-            <p className="text-xs text-gray-500 mt-2">建议同时在上方官方渠道注册，覆盖更全。</p>
+            <p className="text-xs text-slate-500 mt-2">建议同时在上方官方渠道注册，覆盖更全。</p>
           </div>
         ) : (
           <div className="card p-4 space-y-3">
@@ -379,32 +382,33 @@ function Donate() {
   return (
     <div className="space-y-4">
       <Disclaimer>
-        ⚠️ 捐款前用民政部「慈善中国」核验募捐主体资质与备案编号。只在群聊/短信/陌生链接出现的收款码、个人账号一律不要转账。
+        <AlertTriangle className="inline h-3.5 w-3.5 -mt-0.5 mr-1 text-warn-600" strokeWidth={2.25} />
+        捐款前用民政部「慈善中国」核验募捐主体资质与备案编号。只在群聊/短信/陌生链接出现的收款码、个人账号一律不要转账。
       </Disclaimer>
       <section>
         <h2 className="section-title mb-2">合规捐赠渠道</h2>
         <div className="space-y-2">
           {donationChannels.map((o) => (
             <a key={o.name} href={o.url} target="_blank" rel="noreferrer" className="card p-3 flex items-center gap-3">
-              <span className="text-xl">❤️</span>
+              <span className="grid place-items-center h-10 w-10 rounded-xl bg-danger-50 text-danger-600 shrink-0"><Heart className="h-5 w-5" strokeWidth={2} /></span>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold text-gray-900">{o.name}</span>
+                  <span className="font-semibold text-slate-900">{o.name}</span>
                   <VerifyBadge level={o.verify} />
                 </div>
-                <p className="text-xs text-gray-500 mt-0.5 leading-snug">{o.desc}</p>
+                <p className="text-xs text-slate-500 mt-0.5 leading-snug">{o.desc}</p>
               </div>
-              <span className="text-gray-300">›</span>
+              <span className="text-slate-300">›</span>
             </a>
           ))}
         </div>
       </section>
       <section>
-        <h2 className="section-title mb-2">🛡️ 防骗捐要点</h2>
+        <h2 className="section-title mb-2"><ShieldCheck className="h-4 w-4 text-safe-600" strokeWidth={2.25} />防骗捐要点</h2>
         <div className="card p-4">
           <ul className="space-y-2">
             {antiFraudTips.map((t, i) => (
-              <li key={i} className="flex gap-2 text-sm text-gray-700">
+              <li key={i} className="flex gap-2 text-sm text-slate-700">
                 <span className="text-brand-500 font-bold">{i + 1}.</span>
                 <span className="leading-snug">{t}</span>
               </li>
@@ -418,12 +422,12 @@ function Donate() {
 
 /* ── 小组件 ── */
 const inputCls =
-  'w-full rounded-lg border border-gray-200 px-3 py-2 text-base focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white'
+  'w-full rounded-lg border border-slate-200 px-3 py-2 text-base focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white'
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="text-xs text-gray-500 mb-1 block">{label}</span>
+      <span className="text-xs text-slate-500 mb-1 block">{label}</span>
       {children}
     </label>
   )

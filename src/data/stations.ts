@@ -2,17 +2,19 @@
 // 纪律：安置点高度动态、名单必然过期；官方通稿多只给场所名、不给门牌/坐标/电话 → 一律留空、绝不杜撰。
 // 首屏优先引导官方查询入口；平台自维护条目全部带 verify 徽标与更新时间。
 
+import type { LucideIcon } from 'lucide-react'
+import { House, Package, Cross, Droplets } from 'lucide-react'
 import type { VerifyLevel } from './phones'
 
 export type StationType = 'shelter' | 'supply' | 'medical' | 'water'
 export type GeoStatus = 'official' | 'name_only' | 'unknown'
 export type StationStatus = 'open' | 'full' | 'closing' | 'closed' | 'planned' | 'unknown'
 
-export const stationTypeMeta: Record<StationType, { label: string; icon: string }> = {
-  shelter: { label: '安置点', icon: '🏠' },
-  supply: { label: '物资发放', icon: '📦' },
-  medical: { label: '医疗点', icon: '⛑️' },
-  water: { label: '取水点', icon: '🚰' },
+export const stationTypeMeta: Record<StationType, { label: string; icon: LucideIcon }> = {
+  shelter: { label: '安置点', icon: House },
+  supply: { label: '物资发放', icon: Package },
+  medical: { label: '医疗点', icon: Cross },
+  water: { label: '取水点', icon: Droplets },
 }
 
 export interface ReliefStation {

@@ -1,3 +1,4 @@
+import { Navigation } from 'lucide-react'
 import { amapNav, qqNav, amapSearch, qqSearch } from '../lib/map'
 
 interface Props {
@@ -14,13 +15,16 @@ export default function NavButtons({ name, city, lat, lng, hasCoords }: Props) {
   const keyword = [city, name].filter(Boolean).join(' ')
   const amapUrl = hasCoords && lat != null && lng != null ? amapNav(lat, lng, name) : amapSearch(keyword)
   const qqUrl = hasCoords && lat != null && lng != null ? qqNav(lat, lng, name) : qqSearch(keyword)
+  const verb = hasCoords ? '导航' : '搜索'
   return (
     <div className="flex items-center gap-2">
       <a href={amapUrl} target="_blank" rel="noreferrer" className="btn-ghost !py-1.5 !px-3 text-xs">
-        🧭 高德{hasCoords ? '导航' : '搜索'}
+        <Navigation className="h-3.5 w-3.5" strokeWidth={2.5} />
+        高德{verb}
       </a>
       <a href={qqUrl} target="_blank" rel="noreferrer" className="btn-ghost !py-1.5 !px-3 text-xs">
-        🧭 腾讯{hasCoords ? '导航' : '搜索'}
+        <Navigation className="h-3.5 w-3.5" strokeWidth={2.5} />
+        腾讯{verb}
       </a>
     </div>
   )

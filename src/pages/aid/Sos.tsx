@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { LifeBuoy, Camera, Sparkles, CheckCircle2, MessageSquareText, AlertTriangle, ListChecks, MapPin, Dna, Phone, Plus } from 'lucide-react'
 import Disclaimer from '../../components/Disclaimer'
 import { addHelpRequest } from '../../lib/aid'
 import { isAiConfigured, analyzeSos, fileToDataUrl } from '../../lib/ai'
@@ -14,7 +15,7 @@ const URGENCY = [
 ]
 
 const inputCls =
-  'w-full rounded-lg border border-gray-200 px-3 py-2 text-base focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white'
+  'w-full rounded-lg border border-slate-200 px-3 py-2 text-base focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white'
 
 function toggle<T>(arr: T[], v: T): T[] {
   return arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v]
@@ -160,9 +161,9 @@ export default function Sos({ onSubmitted }: { onSubmitted?: () => void }) {
   if (done) {
     return (
       <div className="card p-5 text-center">
-        <div className="text-4xl">✅</div>
-        <p className="font-bold text-gray-900 mt-2">求助已提交</p>
-        <p className="text-sm text-gray-500 mt-1">你的求助已进入求助墙等待对接。若情况危急，请同时拨打 110 / 119 / 120。</p>
+        <CheckCircle2 className="h-11 w-11 text-safe-600 mx-auto" strokeWidth={2.25} />
+        <p className="font-bold text-slate-900 mt-2">求助已提交</p>
+        <p className="text-sm text-slate-500 mt-1">你的求助已进入求助墙等待对接。若情况危急，请同时拨打 110 / 119 / 120。</p>
         <button
           className="btn-ghost mt-4"
           onClick={() => {
@@ -179,29 +180,36 @@ export default function Sos({ onSubmitted }: { onSubmitted?: () => void }) {
   return (
     <div className="space-y-4">
       <Disclaimer>
-        🆘 <b>一步步告诉我们你的情况</b>：能拍照就拍照、能说一句是一句、说方言也没关系。命悬一线请<b>先拨 110/119/120</b>，再来这里登记。
+        <LifeBuoy className="inline h-3.5 w-3.5 -mt-0.5 mr-1 text-danger-600" strokeWidth={2.25} />
+        <b>一步步告诉我们你的情况</b>：能拍照就拍照、能说一句是一句、说方言也没关系。命悬一线请<b>先拨 110/119/120</b>，再来这里登记。
       </Disclaimer>
 
       {/* 拍照 */}
       <section className="card p-4">
-        <h3 className="section-title mb-2">① 拍照 / 上传现场照片</h3>
+        <h3 className="section-title mb-2">
+          <span className="grid place-items-center h-5 w-5 rounded-full bg-brand-100 text-brand-700 text-xs font-semibold shrink-0">1</span>
+          <Camera className="h-4 w-4 text-brand-600" strokeWidth={2.25} />拍照 / 上传现场照片
+        </h3>
         <input ref={fileRef} type="file" accept="image/*" capture="environment" multiple className="hidden" onChange={onPickPhotos} />
         <div className="flex flex-wrap gap-2">
           {photos.map((src, i) => (
-            <img key={i} src={src} className="w-20 h-20 object-cover rounded-lg border border-gray-200" />
+            <img key={i} src={src} className="w-20 h-20 object-cover rounded-lg border border-slate-200" />
           ))}
           {photos.length < 6 && (
-            <button onClick={() => fileRef.current?.click()} className="w-20 h-20 rounded-lg border-2 border-dashed border-gray-300 text-gray-400 text-3xl">
-              ＋
+            <button onClick={() => fileRef.current?.click()} className="grid place-items-center w-20 h-20 rounded-lg border-2 border-dashed border-slate-300 text-slate-400">
+              <Plus className="h-7 w-7" strokeWidth={2.25} />
             </button>
           )}
         </div>
-        <p className="text-[11px] text-gray-400 mt-2">拍下被困位置、水位、伤病、药盒等。照片将在配置存储后由救援方查看。</p>
+        <p className="text-[11px] text-slate-400 mt-2">拍下被困位置、水位、伤病、药盒等。照片将在配置存储后由救援方查看。</p>
       </section>
 
       {/* 一句话/粘贴 */}
       <section className="card p-4">
-        <h3 className="section-title mb-2">② 说一句话 / 粘贴群消息</h3>
+        <h3 className="section-title mb-2">
+          <span className="grid place-items-center h-5 w-5 rounded-full bg-brand-100 text-brand-700 text-xs font-semibold shrink-0">2</span>
+          <MessageSquareText className="h-4 w-4 text-brand-600" strokeWidth={2.25} />说一句话 / 粘贴群消息
+        </h3>
         <textarea
           className={inputCls}
           rows={3}
@@ -211,17 +219,26 @@ export default function Sos({ onSubmitted }: { onSubmitted?: () => void }) {
         />
         {isAiConfigured ? (
           <button onClick={runAi} disabled={aiBusy} className="btn-brand w-full mt-2 disabled:opacity-60">
-            {aiBusy ? '✨ AI 整理中…' : '✨ 用 AI 整理照片和描述'}
+            <Sparkles className="h-4 w-4" strokeWidth={2.25} />
+            {aiBusy ? 'AI 整理中…' : '用 AI 整理照片和描述'}
           </button>
         ) : (
-          <p className="text-[11px] text-gray-500 mt-1">照片和这段话会由救援方查看（接入 AI 后可一键自动整理成结构化求助）。</p>
+          <p className="text-[11px] text-slate-500 mt-1">照片和这段话会由救援方查看（接入 AI 后可一键自动整理成结构化求助）。</p>
         )}
-        {aiNote && <p className="text-xs text-safe-700 bg-safe-50 rounded-lg px-3 py-2 mt-2">✅ {aiNote}</p>}
+        {aiNote && (
+          <p className="flex items-start gap-1.5 text-xs text-safe-700 bg-safe-50 rounded-lg px-3 py-2 mt-2">
+            <CheckCircle2 className="h-3.5 w-3.5 mt-0.5 shrink-0" strokeWidth={2.25} />
+            <span>{aiNote}</span>
+          </p>
+        )}
       </section>
 
       {/* 紧急程度 */}
       <section className="card p-4">
-        <h3 className="section-title mb-2">③ 有多紧急</h3>
+        <h3 className="section-title mb-2">
+          <span className="grid place-items-center h-5 w-5 rounded-full bg-brand-100 text-brand-700 text-xs font-semibold shrink-0">3</span>
+          <AlertTriangle className="h-4 w-4 text-warn-600" strokeWidth={2.25} />有多紧急
+        </h3>
         <div className="grid grid-cols-2 gap-2">
           {URGENCY.map((u) => (
             <button
@@ -238,21 +255,24 @@ export default function Sos({ onSubmitted }: { onSubmitted?: () => void }) {
 
       {/* 需求类型 */}
       <section className="card p-4">
-        <h3 className="section-title mb-2">④ 你最需要什么（可多选）</h3>
+        <h3 className="section-title mb-2">
+          <span className="grid place-items-center h-5 w-5 rounded-full bg-brand-100 text-brand-700 text-xs font-semibold shrink-0">4</span>
+          <ListChecks className="h-4 w-4 text-brand-600" strokeWidth={2.25} />你最需要什么（可多选）
+        </h3>
         <div className="flex flex-wrap gap-2">
           {NEED_TYPES.map((t) => (
             <button key={t} onClick={() => setNeedTypes((a) => toggle(a, t))}
-              className={`px-3 py-1.5 rounded-full text-sm border ${needTypes.includes(t) ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-gray-600 border-gray-200'}`}>
+              className={`px-3 py-1.5 rounded-full text-sm border ${needTypes.includes(t) ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-slate-600 border-slate-200'}`}>
               {t}
             </button>
           ))}
         </div>
         <div className="mt-3">
-          <div className="text-xs text-gray-500 mb-1.5">需要哪些物资</div>
+          <div className="text-xs text-slate-500 mb-1.5">需要哪些物资</div>
           <div className="flex flex-wrap gap-2">
             {SUPPLY_TAGS.map((t) => (
               <button key={t} onClick={() => setSupplies((a) => toggle(a, t))}
-                className={`px-3 py-1.5 rounded-full text-sm border ${supplies.includes(t) ? 'bg-warn-500 text-white border-warn-500' : 'bg-white text-gray-600 border-gray-200'}`}>
+                className={`px-3 py-1.5 rounded-full text-sm border ${supplies.includes(t) ? 'bg-warn-500 text-white border-warn-500' : 'bg-white text-slate-600 border-slate-200'}`}>
                 {t}
               </button>
             ))}
@@ -262,18 +282,23 @@ export default function Sos({ onSubmitted }: { onSubmitted?: () => void }) {
 
       {/* 位置 & 人员 */}
       <section className="card p-4 space-y-3">
-        <h3 className="section-title">⑤ 你在哪里 · 都有谁</h3>
+        <h3 className="section-title">
+          <span className="grid place-items-center h-5 w-5 rounded-full bg-brand-100 text-brand-700 text-xs font-semibold shrink-0">5</span>
+          <MapPin className="h-4 w-4 text-brand-600" strokeWidth={2.25} />你在哪里 · 都有谁
+        </h3>
         <div>
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs text-gray-500">所在位置</span>
-            <button onClick={locate} className="text-xs text-brand-600">📍 获取定位</button>
+            <span className="text-xs text-slate-500">所在位置</span>
+            <button onClick={locate} className="flex items-center gap-1 text-xs text-brand-600">
+              <MapPin className="h-3.5 w-3.5" strokeWidth={2.25} />获取定位
+            </button>
           </div>
           <input className={inputCls} value={location} onChange={(e) => setLocation(e.target.value)} placeholder="市/县/乡镇/村/小区/楼层，越具体越好" />
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-xs text-gray-500">人数</span>
+          <span className="text-xs text-slate-500">人数</span>
           <input className={`${inputCls} w-24`} type="number" inputMode="numeric" value={people} onChange={(e) => setPeople(e.target.value)} placeholder="如 4" />
-          <span className="text-xs text-gray-500 ml-2">能否行动</span>
+          <span className="text-xs text-slate-500 ml-2">能否行动</span>
           <select className={`${inputCls} flex-1`} value={canMove} onChange={(e) => setCanMove(e.target.value)}>
             <option value="unknown">不确定</option>
             <option value="yes">能</option>
@@ -282,11 +307,11 @@ export default function Sos({ onSubmitted }: { onSubmitted?: () => void }) {
           </select>
         </div>
         <div>
-          <div className="text-xs text-gray-500 mb-1.5">特殊人群（可多选）</div>
+          <div className="text-xs text-slate-500 mb-1.5">特殊人群（可多选）</div>
           <div className="flex flex-wrap gap-2">
             {VULN_TAGS.map((t) => (
               <button key={t} onClick={() => setVuln((a) => toggle(a, t))}
-                className={`px-3 py-1.5 rounded-full text-sm border ${vuln.includes(t) ? 'bg-danger-500 text-white border-danger-500' : 'bg-white text-gray-600 border-gray-200'}`}>
+                className={`px-3 py-1.5 rounded-full text-sm border ${vuln.includes(t) ? 'bg-danger-500 text-white border-danger-500' : 'bg-white text-slate-600 border-slate-200'}`}>
                 {t}
               </button>
             ))}
@@ -298,7 +323,10 @@ export default function Sos({ onSubmitted }: { onSubmitted?: () => void }) {
       <section className="card p-4">
         <label className="flex items-center gap-2 cursor-pointer">
           <input type="checkbox" checked={isRare} onChange={(e) => setIsRare(e.target.checked)} className="w-4 h-4 accent-brand-600" />
-          <span className="section-title">⑥ 涉及罕见病 / 慢病患者（透析/胰岛素/供氧等）</span>
+          <span className="section-title">
+            <span className="grid place-items-center h-5 w-5 rounded-full bg-brand-100 text-brand-700 text-xs font-semibold shrink-0">6</span>
+            <Dna className="h-4 w-4 text-brand-600" strokeWidth={2.25} />涉及罕见病 / 慢病患者（透析/胰岛素/供氧等）
+          </span>
         </label>
         {isRare && (
           <div className="mt-3 space-y-2">
@@ -308,13 +336,14 @@ export default function Sos({ onSubmitted }: { onSubmitted?: () => void }) {
             <div className="flex flex-wrap gap-2">
               {([['dialysis', '需透析'], ['oxygen', '需供氧'], ['coldChain', '有冷藏药']] as const).map(([k, label]) => (
                 <button key={k} onClick={() => setRare({ ...rare, [k]: !rare[k] })}
-                  className={`px-3 py-1.5 rounded-full text-sm border ${rare[k] ? 'bg-danger-600 text-white border-danger-600' : 'bg-white text-gray-600 border-gray-200'}`}>
+                  className={`px-3 py-1.5 rounded-full text-sm border ${rare[k] ? 'bg-danger-600 text-white border-danger-600' : 'bg-white text-slate-600 border-slate-200'}`}>
                   {label}
                 </button>
               ))}
             </div>
-            <p className="text-sm text-warn-700 bg-warn-50 rounded-lg px-3 py-2">
-              <b>断药 / 断透析 / 断氧可能危及生命</b>，请同时拨 120，并见「罕见病」页应急要点与援助热线。
+            <p className="flex items-start gap-1.5 text-sm text-warn-700 bg-warn-50 rounded-lg px-3 py-2">
+              <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" strokeWidth={2.25} />
+              <span><b>断药 / 断透析 / 断氧可能危及生命</b>，请同时拨 120，并见「罕见病」页应急要点与援助热线。</span>
             </p>
           </div>
         )}
@@ -322,7 +351,10 @@ export default function Sos({ onSubmitted }: { onSubmitted?: () => void }) {
 
       {/* 联系方式 */}
       <section className="card p-4 space-y-2">
-        <h3 className="section-title">⑦ 联系方式（救援回拨用）</h3>
+        <h3 className="section-title">
+          <span className="grid place-items-center h-5 w-5 rounded-full bg-brand-100 text-brand-700 text-xs font-semibold shrink-0">7</span>
+          <Phone className="h-4 w-4 text-brand-600" strokeWidth={2.25} />联系方式（救援回拨用）
+        </h3>
         <div className="grid grid-cols-2 gap-2">
           <input className={inputCls} value={contact.name} onChange={(e) => setContact({ ...contact, name: e.target.value })} placeholder="称呼（选填）" />
           <input className={inputCls} type="tel" inputMode="tel" value={contact.phone} onChange={(e) => setContact({ ...contact, phone: e.target.value })} placeholder="联系电话 *" />
@@ -331,9 +363,9 @@ export default function Sos({ onSubmitted }: { onSubmitted?: () => void }) {
 
       {err && <p className="text-sm text-danger-600">{err}</p>}
       <button onClick={submit} disabled={busy} className="btn-danger w-full text-base disabled:opacity-60">
-        {busy ? '提交中…' : '🆘 提交求助'}
+        {busy ? '提交中…' : (<><LifeBuoy className="h-4 w-4" strokeWidth={2.25} />提交求助</>)}
       </button>
-      <p className="text-[11px] text-gray-500 text-center pb-2">
+      <p className="text-[11px] text-slate-500 text-center pb-2">
         提交即进入求助墙等待对接。公开求助墙只显示脱敏摘要；你的原始描述、精确位置、病历与完整电话仅救援方（认领后）可见，不公开展示。
       </p>
     </div>
