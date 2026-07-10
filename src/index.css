@@ -36,8 +36,9 @@ body {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+/* 顶部安全区叠加基础留白（无刘海时仍保留 0.75rem，不被 unlayered 覆盖） */
 .pt-safe {
-  padding-top: env(safe-area-inset-top, 0px);
+  padding-top: calc(env(safe-area-inset-top, 0px) + 0.75rem);
 }
 
 @layer components {

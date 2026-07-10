@@ -13,7 +13,7 @@ const URGENCY = [
 ]
 
 const inputCls =
-  'w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white'
+  'w-full rounded-lg border border-gray-200 px-3 py-2 text-base focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white'
 
 function toggle<T>(arr: T[], v: T): T[] {
   return arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v]
@@ -28,6 +28,7 @@ export default function Sos({ onSubmitted }: { onSubmitted?: () => void }) {
   const [supplies, setSupplies] = useState<string[]>([])
   const [vuln, setVuln] = useState<string[]>([])
   const [location, setLocation] = useState('')
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null)
   const [people, setPeople] = useState('')
   const [canMove, setCanMove] = useState('unknown')
   const [isRare, setIsRare] = useState(false)
@@ -45,7 +46,10 @@ export default function Sos({ onSubmitted }: { onSubmitted?: () => void }) {
   function locate() {
     if (!navigator.geolocation) return
     navigator.geolocation.getCurrentPosition(
-      () => setLocation((l) => (l ? l : '') + '（已获取手机定位，请补充文字位置）'),
+      (pos) => {
+        setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+        setLocation((l) => (l.includes('手机定位') ? l : `${l ? l + ' ' : ''}（已获取手机定位坐标，请补充文字位置）`))
+      },
       () => setErr('定位失败，请手动填写位置'),
     )
   }
@@ -61,14 +65,21 @@ export default function Sos({ onSubmitted }: { onSubmitted?: () => void }) {
       return
     }
     setBusy(true)
-    // 组织成人类可读的求助详情
-    const parts: string[] = []
-    if (rawText.trim()) parts.push(rawText.trim())
-    if (location.trim()) parts.push(`📍位置：${location.trim()}`)
-    if (vuln.length) parts.push(`特殊人群：${vuln.join('、')}`)
-    if (canMove !== 'unknown') parts.push(`能否行动：${canMove === 'yes' ? '能' : canMove === 'partial' ? '部分' : '不能'}`)
-    if (supplies.length) parts.push(`需要物资：${supplies.join('、')}`)
-    if (photos.length) parts.push(`（附 ${photos.length} 张照片，配置存储后上传）`)
+    // 公开摘要（脱敏，进公开求助墙）——只含需求/人群/物资等非敏感结构化信息
+    const pub: string[] = []
+    if (needTypes.length) pub.push(`需求：${needTypes.join('、')}`)
+    if (vuln.length) pub.push(`特殊人群：${vuln.join('、')}`)
+    if (canMove !== 'unknown') pub.push(`能否行动：${canMove === 'yes' ? '能' : canMove === 'partial' ? '部分' : '不能'}`)
+    if (supplies.length) pub.push(`需要物资：${supplies.join('、')}`)
+    if (isRare) pub.push('涉及罕见病/慢病患者')
+    if (photos.length) pub.push(`附 ${photos.length} 张照片`)
+    pub.push('（精确位置/病历/完整电话仅救援方可见）')
+
+    // 私有详情（仅救援方 service_role 可见，不进公开墙）——含原话、精确位置、坐标、病历
+    const priv: string[] = []
+    if (rawText.trim()) priv.push(`原始描述：${rawText.trim()}`)
+    if (location.trim()) priv.push(`精确位置：${location.trim()}`)
+    if (coords) priv.push(`定位坐标：${coords.lat.toFixed(6)},${coords.lng.toFixed(6)}`)
     if (isRare) {
       const r: string[] = ['【罕见病/慢病】']
       if (rare.disease) r.push(`病种：${rare.disease}`)
@@ -76,7 +87,7 @@ export default function Sos({ onSubmitted }: { onSubmitted?: () => void }) {
       if (rare.meds) r.push(`所需药物及剩余量：${rare.meds}`)
       const dep = [rare.dialysis && '需透析', rare.oxygen && '需供氧', rare.coldChain && '有冷藏药'].filter(Boolean)
       if (dep.length) r.push(dep.join('、'))
-      parts.push(r.join('；'))
+      priv.push(r.join('；'))
     }
     try {
       await addHelpRequest({
@@ -85,7 +96,10 @@ export default function Sos({ onSubmitted }: { onSubmitted?: () => void }) {
         phone: contact.phone.trim(),
         city: null,
         people: people ? Number(people) : null,
-        detail: parts.join('\n'),
+        detail: pub.join('\n'),
+        privateDetail: priv.length ? priv.join('\n') : null,
+        lat: coords?.lat ?? null,
+        lng: coords?.lng ?? null,
         urgency,
         needs: [...needTypes, ...supplies],
         rareDisease: isRare,
@@ -109,7 +123,7 @@ export default function Sos({ onSubmitted }: { onSubmitted?: () => void }) {
           className="btn-ghost mt-4"
           onClick={() => {
             setDone(false)
-            setPhotos([]); setRawText(''); setNeedTypes([]); setSupplies([]); setVuln([]); setLocation(''); setPeople(''); setIsRare(false); setContact({ name: '', phone: '' })
+            setPhotos([]); setRawText(''); setNeedTypes([]); setSupplies([]); setVuln([]); setLocation(''); setCoords(null); setPeople(''); setIsRare(false); setContact({ name: '', phone: '' })
           }}
         >
           再发一条
@@ -248,8 +262,8 @@ export default function Sos({ onSubmitted }: { onSubmitted?: () => void }) {
                 </button>
               ))}
             </div>
-            <p className="text-[11px] text-warn-700 bg-warn-50 rounded-lg px-3 py-2">
-              断药/断透析/断氧可能危及生命，请同时拨 120，并见「罕见病」页应急要点与援助热线。
+            <p className="text-sm text-warn-700 bg-warn-50 rounded-lg px-3 py-2">
+              <b>断药 / 断透析 / 断氧可能危及生命</b>，请同时拨 120，并见「罕见病」页应急要点与援助热线。
             </p>
           </div>
         )}
@@ -268,8 +282,8 @@ export default function Sos({ onSubmitted }: { onSubmitted?: () => void }) {
       <button onClick={submit} disabled={busy} className="btn-danger w-full text-base disabled:opacity-60">
         {busy ? '提交中…' : '🆘 提交求助'}
       </button>
-      <p className="text-[11px] text-gray-400 text-center pb-2">
-        提交即进入求助墙等待对接。请勿泄露过多敏感信息；病历、精确定位等仅供救援方，不公开展示。
+      <p className="text-[11px] text-gray-500 text-center pb-2">
+        提交即进入求助墙等待对接。公开求助墙只显示脱敏摘要；你的原始描述、精确位置、病历与完整电话仅救援方（认领后）可见，不公开展示。
       </p>
     </div>
   )

@@ -11,15 +11,21 @@ export default function CallRow({ entry }: { entry: PhoneEntry }) {
           <VerifyBadge level={entry.verify} />
         </div>
         {entry.scenario && <p className="text-xs text-gray-500 mt-0.5 leading-snug">{entry.scenario}</p>}
-        {entry.note && <p className="text-[11px] text-gray-400 mt-0.5">{entry.note}</p>}
+        {entry.note && <p className="text-[11px] text-gray-600 mt-0.5">{entry.note}</p>}
       </div>
-      <a
-        href={`tel:${entry.number.replace(/\s/g, '')}`}
-        className="btn-danger !px-3 !py-2 shrink-0 text-sm"
-        aria-label={`拨打 ${entry.name} ${entry.number}`}
-      >
-        📞 {entry.number}
-      </a>
+      {entry.verify === 'unverified' ? (
+        <span className="text-xs text-warn-700 shrink-0 text-right leading-snug">
+          待核实<br />请拨 12345
+        </span>
+      ) : (
+        <a
+          href={`tel:${entry.number.replace(/\s/g, '')}`}
+          className="btn-danger !px-3 !py-2 shrink-0 text-sm"
+          aria-label={`拨打 ${entry.name} ${entry.number}`}
+        >
+          📞 {entry.number}
+        </a>
+      )}
     </div>
   )
 }

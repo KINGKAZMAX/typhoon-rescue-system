@@ -1,6 +1,12 @@
 import PageHeader from '../components/PageHeader'
 import { typhoon } from '../data/typhoon'
 
+const borderByLevel: Record<string, string> = {
+  none: 'border-safe-500',
+  watch: 'border-warn-500',
+  active: 'border-danger-600',
+}
+
 export default function Forecast() {
   const t = typhoon
   return (
@@ -9,7 +15,7 @@ export default function Forecast() {
 
       <div className="px-4 py-4 space-y-4">
         {/* 广西结论 */}
-        <div className="card p-4 border-l-4 border-safe-500">
+        <div className={`card p-4 border-l-4 ${borderByLevel[t.guangxiLevel] ?? 'border-gray-300'}`}>
           <div className="text-xs text-gray-500 mb-1">对广西的当前结论</div>
           <p className="text-sm font-semibold text-gray-900 leading-relaxed">{t.guangxiHeadline}</p>
         </div>

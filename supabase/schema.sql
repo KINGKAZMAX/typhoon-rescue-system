@@ -1,23 +1,26 @@
 -- 广西台风救援平台 · Supabase 建表脚本
 -- 在 Supabase 控制台 → SQL Editor 执行。执行后把项目 URL / anon key 填入 .env.local。
 
--- ── 求助信息（公开求助墙）──
+-- ── 求助信息（工单化：待对接 pending → 对接中 claimed → 已解决 rescued）──
+-- 隐私分级：detail 为公开脱敏摘要（进公开求助墙）；phone / lat / lng / detail_private
+--          为敏感私有列，匿名不可读，仅救援方(service_role/鉴权后台)可读。
 create table if not exists help_requests (
-  id          uuid primary key default gen_random_uuid(),
-  created_at  timestamptz not null default now(),
-  type        text not null,                 -- 被困待救/医疗急需/物资短缺/临时住宿/道路失联/其他
-  name        text,
-  phone       text not null,                 -- 救援人员回拨用
-  city        text,
-  people      int,
-  detail      text not null,
-  -- 结构化需求（AI 拍照求助生成，可空）
-  urgency     text,                          -- 危急/紧急/一般
-  needs       jsonb,                         -- 物资清单等
-  rare_disease jsonb,                        -- 罕见病/慢病字段（病种/体征/用药/透析/供氧）
-  lat         double precision,
-  lng         double precision,
-  status      text not null default 'open'   -- open/processing/resolved
+  id             uuid primary key default gen_random_uuid(),
+  created_at     timestamptz not null default now(),
+  type           text not null,                 -- 被困待救/医疗急需/物资短缺/…
+  name           text,                          -- 敏感
+  phone          text not null,                 -- 敏感：回拨用，公开视图仅返回脱敏
+  city           text,
+  people         int,
+  urgency        text,                          -- critical/high/medium/low
+  needs          jsonb,                         -- 物资/需求清单
+  rare_disease   boolean,                       -- 是否涉及罕见病/慢病（仅布尔标记进公开）
+  detail         text not null,                 -- 公开脱敏摘要
+  detail_private text,                          -- 敏感：原始描述/精确位置/病历
+  lat            double precision,              -- 敏感：精确坐标
+  lng            double precision,
+  status         text not null default 'pending', -- pending/claimed/rescued
+  claimed_by     text                           -- 认领的救援队/志愿者
 );
 
 -- ── 志愿者/救援队报名（隐私：不公开展示，仅供组织方使用）──
@@ -49,14 +52,28 @@ create table if not exists supply_stations (
   verify      text default 'unverified'      -- verified/media/unverified
 );
 
--- ── 行级安全 RLS ──
-alter table help_requests    enable row level security;
+-- ── 行级安全 RLS（安全默认：敏感 PII 绝不对匿名开放）──
+alter table help_requests     enable row level security;
 alter table volunteer_signups enable row level security;
-alter table supply_stations  enable row level security;
+alter table supply_stations   enable row level security;
 
--- 求助墙：匿名可提交、可查看（生产环境建议加审核/限流/字段脱敏）
+-- 求助：匿名可提交；匿名【不可 select 原表】(避免拉走电话/坐标/病历)；
+--       匿名仅可更新工单状态与认领人(列级授权)，用于"我来跟进/已解决"闭环。
 create policy "help insert" on help_requests for insert with check (true);
-create policy "help read"   on help_requests for select using (true);
+create policy "help claim"  on help_requests for update using (true) with check (true);
+revoke select on help_requests from anon;
+grant  update (status, claimed_by) on help_requests to anon;
+
+-- 公开求助墙只读【脱敏视图】：只暴露非敏感列 + 脱敏电话，绝不含精确定位/病历/完整电话/姓名。
+-- 视图默认以属主(postgres)权限运行，绕过原表 RLS，从而安全地只返回脱敏结果。
+create or replace view help_requests_public as
+  select id, created_at, type, city, people, urgency,
+         (rare_disease is true)                          as "rareDisease",
+         detail,
+         left(phone, 3) || '****' || right(phone, 2)     as phone,
+         status, claimed_by                              as "claimedBy"
+  from help_requests;
+grant select on help_requests_public to anon, authenticated;
 
 -- 志愿者报名：仅允许匿名提交，不允许匿名读取（保护报名者隐私，组织方用 service_role 读）
 create policy "vol insert"  on volunteer_signups for insert with check (true);
@@ -64,4 +81,7 @@ create policy "vol insert"  on volunteer_signups for insert with check (true);
 -- 物资站点：匿名可读；写入建议后台/管理员，这里默认不开放匿名写
 create policy "station read" on supply_stations for select using (true);
 
--- 提示：生产环境应对 help_requests 增加内容审核、频率限制，并在前端对展示的电话做脱敏。
+-- ⚠️ 生产环境务必补充（不能靠人力自觉，用机制守住四条底线）：
+--   1) 内容审核 + 频率限制(防刷爆)；2) 认领鉴权(避免任意匿名改状态)；
+--   3) 汛后自动脱敏/销毁个人信息(留脱敏复盘)；
+--   4) 完整 phone / lat / lng / detail_private 仅经鉴权后台(service_role)读取，绝不下发浏览器。

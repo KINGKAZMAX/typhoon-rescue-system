@@ -93,7 +93,7 @@ export default function Directory() {
               <CallRow key={`${city.name}-${e.number}-${e.name}`} entry={e} />
             ))}
           </div>
-          <p className="text-[11px] text-gray-400 mt-1.5">
+          <p className="text-[11px] text-gray-600 mt-1.5">
             {city.name}市其余（燃气/供水/防汛值班等）号码未逐一核实，请拨 {city.areaCode}-12345 转接；
             燃气泄漏并拨 119，触电/停电险情并拨 95598。
           </p>

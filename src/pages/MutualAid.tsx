@@ -9,8 +9,12 @@ import {
   HELP_TYPES,
   VOL_ROLES,
   URGENCY_META,
+  STATUS_META,
+  maskPhone,
+  sortRequests,
   listHelpRequests,
   addHelpRequest,
+  updateHelpStatus,
   addVolunteer,
   type HelpRequest,
 } from '../lib/aid'
@@ -37,20 +41,23 @@ export default function MutualAid() {
 
   return (
     <div>
-      <PageHeader title="🤝 求助与互助" subtitle="拍照求助 · 物资安置 · 罕见病 · 志愿报名 · 捐赠" />
-      {/* 二级 Tab（横向可滚动） */}
-      <div className="sticky top-[52px] z-20 bg-white border-b border-gray-100 flex overflow-x-auto no-scrollbar">
-        {TABS.map(([k, label]) => (
-          <button
-            key={k}
-            onClick={() => setTab(k)}
-            className={`shrink-0 whitespace-nowrap px-4 py-3 text-sm font-medium border-b-2 transition ${
-              tab === k ? 'border-brand-600 text-brand-700' : 'border-transparent text-gray-400'
-            }`}
-          >
-            {label}
-          </button>
-        ))}
+      {/* header 与二级 Tab 作为一个整体吸顶，避免硬编码偏移导致遮挡 */}
+      <div className="sticky top-0 z-30">
+        <PageHeader title="🤝 求助与互助" subtitle="拍照求助 · 物资安置 · 罕见病 · 志愿报名 · 捐赠" />
+        {/* 二级 Tab（横向可滚动） */}
+        <div className="bg-white border-b border-gray-100 flex overflow-x-auto no-scrollbar">
+          {TABS.map(([k, label]) => (
+            <button
+              key={k}
+              onClick={() => setTab(k)}
+              className={`shrink-0 whitespace-nowrap px-4 py-3 text-sm font-medium border-b-2 transition ${
+                tab === k ? 'border-brand-600 text-brand-700' : 'border-transparent text-gray-400'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="px-4 py-4">
@@ -76,7 +83,7 @@ function HelpWall() {
     setLoading(true)
     try {
       const { data, demo } = await listHelpRequests()
-      setList(data)
+      setList(sortRequests(data))
       setDemo(demo)
     } catch {
       setDemo(true)
@@ -87,6 +94,11 @@ function HelpWall() {
   useEffect(() => {
     load()
   }, [])
+
+  async function setStatus(id: string, status: string) {
+    await updateHelpStatus(id, status)
+    await load()
+  }
 
   return (
     <div className="space-y-3">
@@ -105,34 +117,55 @@ function HelpWall() {
       {showForm && <HelpForm onDone={() => { setShowForm(false); load() }} />}
 
       <div className="space-y-2">
-        {list.map((r) => (
-          <div key={r.id} className="card p-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                {r.urgency && URGENCY_META[r.urgency] && (
-                  <span className={`badge font-semibold ${URGENCY_META[r.urgency].cls}`}>{URGENCY_META[r.urgency].label}</span>
-                )}
-                <span className="badge bg-danger-50 text-danger-700 font-semibold">{r.type}</span>
-                {r.rareDisease && <span className="badge bg-brand-100 text-brand-700">🧬 罕见病</span>}
+        {list.map((r) => {
+          const status = r.status ?? 'pending'
+          const claimed = status === 'claimed'
+          const rescued = status === 'rescued'
+          return (
+            <div key={r.id} className={`card p-3 ${rescued ? 'opacity-60' : ''}`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  {STATUS_META[status] && (
+                    <span className={`badge font-semibold ${STATUS_META[status].cls}`}>{STATUS_META[status].label}</span>
+                  )}
+                  {r.urgency && URGENCY_META[r.urgency] && (
+                    <span className={`badge font-semibold ${URGENCY_META[r.urgency].cls}`}>{URGENCY_META[r.urgency].label}</span>
+                  )}
+                  <span className="badge bg-danger-50 text-danger-700 font-semibold">{r.type}</span>
+                  {r.rareDisease && <span className="badge bg-brand-100 text-brand-700">🧬 罕见病</span>}
+                </div>
+                <span className="text-[11px] text-gray-400">{timeAgo(r.created_at)}</span>
               </div>
-              <span className="text-[11px] text-gray-400">{timeAgo(r.created_at)}</span>
+              <p className="text-sm text-gray-800 mt-2 leading-relaxed whitespace-pre-line">{r.detail}</p>
+              <div className="flex items-center justify-between mt-2 gap-2">
+                <span className="text-xs text-gray-500 min-w-0 truncate">
+                  {r.city ? `📍${r.city}` : ''}{r.people ? ` · ${r.people}人` : ''}{r.name ? ` · ${r.name}` : ''}
+                  {` · 📞${maskPhone(r.phone)}`}
+                </span>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {!rescued && !claimed && (
+                    <button onClick={() => setStatus(r.id, 'claimed')} className="btn-brand !py-1 !px-2.5 text-xs">
+                      我来跟进
+                    </button>
+                  )}
+                  {claimed && r.phone && (
+                    <a href={`tel:${r.phone.replace(/\s/g, '')}`} className="btn-danger !py-1 !px-2.5 text-xs">
+                      📞 拨打
+                    </a>
+                  )}
+                  {claimed && (
+                    <button onClick={() => setStatus(r.id, 'rescued')} className="btn-ghost !py-1 !px-2.5 text-xs">
+                      ✅ 已解决
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
-            <p className="text-sm text-gray-800 mt-2 leading-relaxed whitespace-pre-line">{r.detail}</p>
-            <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
-              <span>
-                {r.city && `📍${r.city}`} {r.people ? ` · ${r.people}人` : ''} {r.name ? ` · ${r.name}` : ''}
-              </span>
-              {r.phone && !r.phone.includes('*') && (
-                <a href={`tel:${r.phone}`} className="btn-danger !py-1 !px-2.5 text-xs">
-                  📞 联系
-                </a>
-              )}
-            </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
-      <p className="text-[11px] text-gray-400 leading-relaxed pt-1">
-        提示：生命危急请第一时间拨 110/119/120，本墙用于非即时求助的信息对接。请勿在求助内容中泄露过多敏感个人信息。
+      <p className="text-[11px] text-gray-500 leading-relaxed pt-1">
+        工单流程：待对接 → 对接中 → 已解决。认领后方可拨打完整电话（抑制重复救援、防隐私裸奔）。生命危急请第一时间拨 110/119/120，请勿在求助内容里填写过多敏感个人信息。
       </p>
     </div>
   )
@@ -382,7 +415,7 @@ function Donate() {
 
 /* ── 小组件 ── */
 const inputCls =
-  'w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white'
+  'w-full rounded-lg border border-gray-200 px-3 py-2 text-base focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white'
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
