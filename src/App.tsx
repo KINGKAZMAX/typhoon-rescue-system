@@ -17,6 +17,11 @@ export default function App() {
           <Route path="/aid" element={<MutualAid />} />
           <Route path="/guide" element={<Guide />} />
         </Routes>
+        {/* 开发者联系方式（很小字体，全站常驻在内容最底部） */}
+        <footer className="px-4 pt-1 pb-3 text-center text-[10px] leading-relaxed text-slate-400">
+          开发者 小智 · 微信 KING_KAZMAX ·{' '}
+          <a href="mailto:xinlise@gmail.com" className="underline decoration-slate-300">xinlise@gmail.com</a>
+        </footer>
       </main>
       <BottomNav />
     </div>

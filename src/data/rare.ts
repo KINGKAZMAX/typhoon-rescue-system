@@ -58,6 +58,14 @@ export const rareOrgs: RareOrg[] = [
     verify: 'verified',
   },
   {
+    name: 'OpenRD 罕见病开源社区',
+    role: '专注国内罕见病的开源社区项目，通过开源软件与社区协作推动罕见病研究、数据管理与患者支持；欢迎患者、志愿者、开发者参与协作',
+    contact: '邮箱 support@openrd.org · GitHub 组织 openrd-io（Issues 反馈/求助）',
+    email: 'support@openrd.org',
+    url: 'https://github.com/openrd-io/OpenRD-web-server',
+    verify: 'verified',
+  },
+  {
     name: '广西罕见病诊疗协作网医院',
     role: '确诊 / 开具协作网诊断证明（申请全国援助工程前置）；具透析/ICU/供氧/化疗能力，灾后区域兜底。就诊前先电话或看官方公告确认是否开诊',
     contact: '广西医科大学第一附属医院（省内主力 140+ 病种）、广西壮族自治区人民医院（100+）等；总机以官网为准，急救走 120',
