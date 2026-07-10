@@ -45,6 +45,21 @@ export default function Home() {
           </div>
         </Link>
 
+        {/* 拍照求助大按钮 */}
+        <Link
+          to="/aid?tab=sos"
+          className="block bg-danger-600 active:bg-danger-700 text-white rounded-2xl px-4 py-4 shadow-sm active:scale-[0.99] transition"
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-3xl">🆘</span>
+            <div className="flex-1">
+              <div className="font-bold text-lg leading-tight">拍照求助</div>
+              <div className="text-xs text-danger-100 mt-0.5">拍张照 · 说一句 · 方言也行 —— 帮你把求助送到救援方</div>
+            </div>
+            <span className="text-xl">›</span>
+          </div>
+        </Link>
+
         {/* 紧急拨号 */}
         <section>
           <h2 className="section-title mb-2">🚨 紧急拨号</h2>

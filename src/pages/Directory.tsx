@@ -10,6 +10,7 @@ import {
   cities,
   civilOrgs,
 } from '../data/phones'
+import { rareHotlines } from '../data/rare'
 
 export default function Directory() {
   const [cityIdx, setCityIdx] = useState(0)
@@ -44,6 +45,19 @@ export default function Directory() {
               <CallRow key={e.number} entry={e} />
             ))}
           </div>
+        </section>
+
+        {/* 罕见病 / 慢病援助 */}
+        <section>
+          <h2 className="section-title mb-1">🧬 罕见病 / 慢病援助</h2>
+          <div className="card px-4 divide-y divide-gray-50">
+            {rareHotlines.map((e) => (
+              <CallRow key={e.number + e.name} entry={e} />
+            ))}
+          </div>
+          <p className="text-[11px] text-gray-400 mt-1.5">
+            断药/断透析/断氧危及生命请先拨 120。更多分病种应急要点见「求助互助 › 罕见病」。
+          </p>
         </section>
 
         {/* 广西 & 民间救援主线 */}

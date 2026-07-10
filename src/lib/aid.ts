@@ -4,6 +4,13 @@ import { supabase, isSupabaseConfigured } from './supabase'
 export const HELP_TYPES = ['被困待救', '医疗急需', '物资短缺', '临时住宿', '道路/失联', '其他'] as const
 export const VOL_ROLES = ['个人志愿者', '救援队', '车辆/船只', '物资捐赠方', '医疗/心理'] as const
 
+export const URGENCY_META: Record<string, { label: string; cls: string }> = {
+  critical: { label: '危急', cls: 'bg-danger-600 text-white' },
+  high: { label: '紧急', cls: 'bg-warn-600 text-white' },
+  medium: { label: '一般', cls: 'bg-warn-100 text-warn-700' },
+  low: { label: '普通', cls: 'bg-safe-100 text-safe-700' },
+}
+
 export interface HelpRequest {
   id: string
   created_at: string
@@ -13,6 +20,9 @@ export interface HelpRequest {
   city?: string | null
   people?: number | null
   detail: string
+  urgency?: string | null
+  needs?: string[] | null
+  rareDisease?: boolean | null
   status?: string | null
 }
 
@@ -75,7 +85,20 @@ export async function addHelpRequest(
   input: Omit<HelpRequest, 'id' | 'created_at' | 'status'>,
 ): Promise<{ demo: boolean }> {
   if (isSupabaseConfigured && supabase) {
-    const { error } = await supabase.from('help_requests').insert([{ ...input, status: 'open' }])
+    // 映射到数据库列（snake_case；结构化需求存 jsonb）
+    const row = {
+      type: input.type,
+      name: input.name,
+      phone: input.phone,
+      city: input.city,
+      people: input.people,
+      detail: input.detail,
+      urgency: input.urgency ?? null,
+      needs: input.needs ?? null,
+      rare_disease: input.rareDisease ?? null,
+      status: 'open',
+    }
+    const { error } = await supabase.from('help_requests').insert([row])
     if (error) throw error
     return { demo: false }
   }

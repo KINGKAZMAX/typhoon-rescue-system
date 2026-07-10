@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import PageHeader from '../components/PageHeader'
 import Disclaimer from '../components/Disclaimer'
 import VerifyBadge from '../components/VerifyBadge'
@@ -7,32 +8,43 @@ import { cities, volunteerChannels, donationChannels, antiFraudTips } from '../d
 import {
   HELP_TYPES,
   VOL_ROLES,
+  URGENCY_META,
   listHelpRequests,
   addHelpRequest,
   addVolunteer,
   type HelpRequest,
 } from '../lib/aid'
+import Sos from './aid/Sos'
+import Stations from './aid/Stations'
+import Rare from './aid/Rare'
 
 const cityNames = cities.map((c) => c.name)
-type Tab = 'help' | 'volunteer' | 'donate'
+type Tab = 'help' | 'sos' | 'stations' | 'rare' | 'volunteer' | 'donate'
+const TABS: [Tab, string][] = [
+  ['sos', '🆘 拍照求助'],
+  ['help', '求助墙'],
+  ['stations', '物资/安置'],
+  ['rare', '罕见病'],
+  ['volunteer', '我要报名'],
+  ['donate', '物资捐赠'],
+]
 
 export default function MutualAid() {
-  const [tab, setTab] = useState<Tab>('help')
+  const [params, setParams] = useSearchParams()
+  const raw = params.get('tab') as Tab | null
+  const tab: Tab = TABS.some(([k]) => k === raw) ? (raw as Tab) : 'sos'
+  const setTab = (k: Tab) => setParams({ tab: k }, { replace: true })
 
   return (
     <div>
-      <PageHeader title="🤝 求助与互助" subtitle="发布求助 · 志愿者/救援队报名 · 物资捐赠" />
-      {/* Tab 切换 */}
-      <div className="sticky top-[52px] z-20 bg-white border-b border-gray-100 flex">
-        {([
-          ['help', '求助墙'],
-          ['volunteer', '我要报名'],
-          ['donate', '物资捐赠'],
-        ] as [Tab, string][]).map(([k, label]) => (
+      <PageHeader title="🤝 求助与互助" subtitle="拍照求助 · 物资安置 · 罕见病 · 志愿报名 · 捐赠" />
+      {/* 二级 Tab（横向可滚动） */}
+      <div className="sticky top-[52px] z-20 bg-white border-b border-gray-100 flex overflow-x-auto no-scrollbar">
+        {TABS.map(([k, label]) => (
           <button
             key={k}
             onClick={() => setTab(k)}
-            className={`flex-1 py-3 text-sm font-medium border-b-2 transition ${
+            className={`shrink-0 whitespace-nowrap px-4 py-3 text-sm font-medium border-b-2 transition ${
               tab === k ? 'border-brand-600 text-brand-700' : 'border-transparent text-gray-400'
             }`}
           >
@@ -42,7 +54,10 @@ export default function MutualAid() {
       </div>
 
       <div className="px-4 py-4">
+        {tab === 'sos' && <Sos onSubmitted={() => setTab('help')} />}
         {tab === 'help' && <HelpWall />}
+        {tab === 'stations' && <Stations />}
+        {tab === 'rare' && <Rare />}
         {tab === 'volunteer' && <VolunteerForm />}
         {tab === 'donate' && <Donate />}
       </div>
@@ -93,10 +108,16 @@ function HelpWall() {
         {list.map((r) => (
           <div key={r.id} className="card p-3">
             <div className="flex items-center justify-between">
-              <span className="badge bg-danger-50 text-danger-700 font-semibold">{r.type}</span>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {r.urgency && URGENCY_META[r.urgency] && (
+                  <span className={`badge font-semibold ${URGENCY_META[r.urgency].cls}`}>{URGENCY_META[r.urgency].label}</span>
+                )}
+                <span className="badge bg-danger-50 text-danger-700 font-semibold">{r.type}</span>
+                {r.rareDisease && <span className="badge bg-brand-100 text-brand-700">🧬 罕见病</span>}
+              </div>
               <span className="text-[11px] text-gray-400">{timeAgo(r.created_at)}</span>
             </div>
-            <p className="text-sm text-gray-800 mt-2 leading-relaxed">{r.detail}</p>
+            <p className="text-sm text-gray-800 mt-2 leading-relaxed whitespace-pre-line">{r.detail}</p>
             <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
               <span>
                 {r.city && `📍${r.city}`} {r.people ? ` · ${r.people}人` : ''} {r.name ? ` · ${r.name}` : ''}
