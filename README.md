@@ -8,6 +8,14 @@
 
 ![广西台风救援平台 · 交互界面总览](docs/overview.png)
 
+完整手机端预览页：`/#/overview`（同页也可用 `/#/mobile-preview` 打开）。导出海报：
+
+```bash
+npm run export:overview
+```
+
+会生成 `广西台风救援平台-交互界面总览.png`，并同步更新 `docs/overview.png`。
+
 ## ✨ 功能模块
 
 | 模块 | 说明 | 后端 |

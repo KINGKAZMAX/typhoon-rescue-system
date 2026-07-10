@@ -8,6 +8,7 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
+    "export:overview": "node scripts/export-overview.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
