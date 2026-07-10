@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import Disclaimer from '../../components/Disclaimer'
 import { addHelpRequest } from '../../lib/aid'
+import { isAiConfigured, analyzeSos, fileToDataUrl } from '../../lib/ai'
 
 const NEED_TYPES = ['被困待救', '医疗急需', '物资短缺', '断药', '需转移', '失联寻人', '需取水', '临时住宿', '心理支援', '其他']
 const SUPPLY_TAGS = ['饮用水', '食物', '药品', '婴儿奶粉/尿布', '被褥', '照明/充电', '卫生用品']
@@ -22,6 +23,9 @@ function toggle<T>(arr: T[], v: T): T[] {
 export default function Sos({ onSubmitted }: { onSubmitted?: () => void }) {
   const fileRef = useRef<HTMLInputElement>(null)
   const [photos, setPhotos] = useState<string[]>([])
+  const [photoFiles, setPhotoFiles] = useState<File[]>([])
+  const [aiBusy, setAiBusy] = useState(false)
+  const [aiNote, setAiNote] = useState('')
   const [rawText, setRawText] = useState('')
   const [urgency, setUrgency] = useState('high')
   const [needTypes, setNeedTypes] = useState<string[]>([])
@@ -41,6 +45,46 @@ export default function Sos({ onSubmitted }: { onSubmitted?: () => void }) {
   function onPickPhotos(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || [])
     setPhotos((p) => [...p, ...files.map((f) => URL.createObjectURL(f))].slice(0, 6))
+    setPhotoFiles((p) => [...p, ...files].slice(0, 6))
+  }
+
+  async function runAi() {
+    setErr('')
+    setAiNote('')
+    setAiBusy(true)
+    try {
+      const images = await Promise.all(photoFiles.slice(0, 4).map(fileToDataUrl))
+      const d = await analyzeSos({ text: rawText, images })
+      if (d.urgency) setUrgency(d.urgency)
+      if (d.needTypes?.length) setNeedTypes(d.needTypes)
+      if (d.supplies?.length) setSupplies(d.supplies)
+      if (d.vuln?.length) setVuln(d.vuln)
+      if (d.location) setLocation((l) => l || d.location!)
+      if (d.people != null) setPeople(String(d.people))
+      if (d.canMove) setCanMove(d.canMove)
+      if (d.isRare) {
+        setIsRare(true)
+        if (d.rare) {
+          setRare((r) => ({
+            disease: d.rare!.disease || r.disease,
+            vitals: d.rare!.vitals || r.vitals,
+            meds: d.rare!.meds || r.meds,
+            dialysis: d.rare!.dialysis ?? r.dialysis,
+            oxygen: d.rare!.oxygen ?? r.oxygen,
+            coldChain: d.rare!.coldChain ?? r.coldChain,
+          }))
+        }
+      }
+      setAiNote(
+        d.uncertain?.length
+          ? `AI 已预填。不确定项请核对：${d.uncertain.join('、')}`
+          : 'AI 已预填各项，请核对后提交。',
+      )
+    } catch (e) {
+      setErr('AI 整理失败，请手动填写；' + (e instanceof Error ? e.message : ''))
+    } finally {
+      setAiBusy(false)
+    }
   }
 
   function locate() {
@@ -123,7 +167,7 @@ export default function Sos({ onSubmitted }: { onSubmitted?: () => void }) {
           className="btn-ghost mt-4"
           onClick={() => {
             setDone(false)
-            setPhotos([]); setRawText(''); setNeedTypes([]); setSupplies([]); setVuln([]); setLocation(''); setCoords(null); setPeople(''); setIsRare(false); setContact({ name: '', phone: '' })
+            setPhotos([]); setPhotoFiles([]); setAiNote(''); setRawText(''); setNeedTypes([]); setSupplies([]); setVuln([]); setLocation(''); setCoords(null); setPeople(''); setIsRare(false); setContact({ name: '', phone: '' })
           }}
         >
           再发一条
@@ -165,7 +209,14 @@ export default function Sos({ onSubmitted }: { onSubmitted?: () => void }) {
           onChange={(e) => setRawText(e.target.value)}
           placeholder="例：我家在钦州久隆镇，一家四口被困二楼，水到一楼窗，老人没药了。也可直接粘贴微信群里的求助消息。"
         />
-        <p className="text-[11px] text-gray-400 mt-1">接入 AI 后，这段话和照片会被自动整理成结构化求助（当前为人工对接）。</p>
+        {isAiConfigured ? (
+          <button onClick={runAi} disabled={aiBusy} className="btn-brand w-full mt-2 disabled:opacity-60">
+            {aiBusy ? '✨ AI 整理中…' : '✨ 用 AI 整理照片和描述'}
+          </button>
+        ) : (
+          <p className="text-[11px] text-gray-500 mt-1">照片和这段话会由救援方查看（接入 AI 后可一键自动整理成结构化求助）。</p>
+        )}
+        {aiNote && <p className="text-xs text-safe-700 bg-safe-50 rounded-lg px-3 py-2 mt-2">✅ {aiNote}</p>}
       </section>
 
       {/* 紧急程度 */}

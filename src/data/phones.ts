@@ -94,6 +94,10 @@ export const cities: CityPhones[] = [
   c('钦州', '0777', [
     { number: '0777-3688678', name: '钦州市应急管理局', scenario: '应急局联系/投诉电话', verify: 'verified' },
     { number: '0777-3696332', name: '钦州供水服务热线', scenario: '开投水务供水报修/咨询', verify: 'verified' },
+    { number: '0777-2693200', name: '钦南区应急指挥中心', scenario: '钦南区应急值守', verify: 'media', note: '来源：钦州新闻网救援热线（2026-07-08）' },
+    { number: '0777-6509600', name: '灵山县应急局值班中心', scenario: '灵山县应急值班', verify: 'media', note: '来源：钦州新闻网救援热线' },
+    { number: '0777-8212340', name: '浦北县应急管理局', scenario: '浦北县应急值班', verify: 'media', note: '来源：钦州新闻网救援热线' },
+    { number: '0777-3686355', name: '钦北区应急管理局', scenario: '钦北区应急值班', verify: 'media', note: '来源：钦州新闻网救援热线' },
   ]),
   c('贵港', '0775', [
     { number: '95158', name: '贵港燃气客服（24h）', scenario: '贵港新奥燃气 24 小时客服/抢修', verify: 'verified' },
