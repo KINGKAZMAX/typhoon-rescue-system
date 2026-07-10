@@ -30,6 +30,7 @@
 
 - Vite + React 18 + TypeScript + Tailwind CSS（移动端优先，底部 Tab 导航）
 - HashRouter（无需服务器重写，任意静态主机可部署）
+- **PWA 离线可用**：Service Worker 预缓存，台风停电断网时仍可查看预报/电话/指南/罕见病；支持"添加到主屏幕"像 App 一样打开
 - Supabase（互助模块后端，**未配置时自动降级为只读/演示**，站点其余部分不受影响）
 - 内容数据为 TS 模块（`src/data/`），Git 版本管理、易更新
 
