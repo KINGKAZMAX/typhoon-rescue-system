@@ -21,12 +21,14 @@ import {
 import Sos from './aid/Sos'
 import Stations from './aid/Stations'
 import Rare from './aid/Rare'
+import Finder from './aid/Finder'
 
 const cityNames = cities.map((c) => c.name)
-type Tab = 'help' | 'sos' | 'stations' | 'rare' | 'volunteer' | 'donate'
+type Tab = 'help' | 'sos' | 'stations' | 'rare' | 'safe' | 'volunteer' | 'donate'
 const TABS: [Tab, string][] = [
   ['sos', '🆘 拍照求助'],
   ['help', '求助墙'],
+  ['safe', '报平安/寻人'],
   ['stations', '物资/安置'],
   ['rare', '罕见病'],
   ['volunteer', '我要报名'],
@@ -63,6 +65,7 @@ export default function MutualAid() {
       <div className="px-4 py-4">
         {tab === 'sos' && <Sos onSubmitted={() => setTab('help')} />}
         {tab === 'help' && <HelpWall />}
+        {tab === 'safe' && <Finder />}
         {tab === 'stations' && <Stations />}
         {tab === 'rare' && <Rare />}
         {tab === 'volunteer' && <VolunteerForm />}

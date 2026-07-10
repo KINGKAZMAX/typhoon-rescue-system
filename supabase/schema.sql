@@ -52,10 +52,24 @@ create table if not exists supply_stations (
   verify      text default 'unverified'      -- verified/media/unverified
 );
 
+-- ── 报平安 / 寻人（对标 Google Person Finder）──
+create table if not exists person_records (
+  id          uuid primary key default gen_random_uuid(),
+  created_at  timestamptz not null default now(),
+  kind        text not null,                 -- 报平安 / 寻人
+  name        text not null,                 -- 可搜索：报平安=本人 / 寻人=被寻者
+  location    text,                          -- 可搜索：所在地 / 最后出现地
+  status      text not null,                 -- 安全/已安置/安全但需帮助/寻找中/已找到
+  phone       text,                          -- 敏感：公开视图脱敏
+  feature     text,                          -- 寻人特征
+  note        text
+);
+
 -- ── 行级安全 RLS（安全默认：敏感 PII 绝不对匿名开放）──
 alter table help_requests     enable row level security;
 alter table volunteer_signups enable row level security;
 alter table supply_stations   enable row level security;
+alter table person_records    enable row level security;
 
 -- 求助：匿名可提交；匿名【不可 select 原表】(避免拉走电话/坐标/病历)；
 --       匿名仅可更新工单状态与认领人(列级授权)，用于"我来跟进/已解决"闭环。
@@ -80,6 +94,18 @@ create policy "vol insert"  on volunteer_signups for insert with check (true);
 
 -- 物资站点：匿名可读；写入建议后台/管理员，这里默认不开放匿名写
 create policy "station read" on supply_stations for select using (true);
+
+-- 报平安/寻人：匿名可提交；匿名不可读原表(避免拉走电话)；仅可更新 status(寻人闭环"已找到")。
+-- 公开只走脱敏视图：姓名/地点可搜索(寻人所需)，电话脱敏。
+create policy "pf insert" on person_records for insert with check (true);
+create policy "pf update" on person_records for update using (true) with check (true);
+revoke select on person_records from anon;
+grant  update (status) on person_records to anon;
+create or replace view person_records_public as
+  select id, created_at, kind, name, location, status, feature, note,
+         left(phone, 3) || '****' || right(phone, 2) as phone
+  from person_records;
+grant select on person_records_public to anon, authenticated;
 
 -- ⚠️ 生产环境务必补充（不能靠人力自觉，用机制守住四条底线）：
 --   1) 内容审核 + 频率限制(防刷爆)；2) 认领鉴权(避免任意匿名改状态)；
