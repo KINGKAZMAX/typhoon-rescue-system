@@ -82,7 +82,7 @@ export default function Home() {
             </div>
             <Link to="/aid?tab=sos" className="btn-danger w-full mt-3">
               <Camera className="h-4 w-4" strokeWidth={2.25} />
-              拍照求助（一句话 / 方言也行）
+              拍照求助 / 方言也行
             </Link>
             <div className="flex flex-wrap gap-2 mt-2.5">
               <a href="tel:110" className="text-xs font-semibold px-3 py-1.5 rounded-full border border-danger-100 text-danger-700 bg-danger-50 active:bg-danger-100 transition">拨 110 报警</a>
@@ -104,7 +104,7 @@ export default function Home() {
             </div>
             <Link to="/aid?tab=stations" className="btn-brand w-full mt-3">
               <MapPin className="h-4 w-4" strokeWidth={2.25} />
-              找安置点 / 物资
+              找安置点 / 物资点
             </Link>
             <div className="flex flex-wrap gap-2 mt-2.5">
               <Link to="/guide" className="text-xs font-semibold px-3 py-1.5 rounded-full border border-slate-200 text-slate-600 bg-white active:bg-slate-50 transition">灾后安全指南</Link>

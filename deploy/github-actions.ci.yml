@@ -1,0 +1,47 @@
+# GitHub Actions 模板：构建校验 + 产物上传
+# ─────────────────────────────────────────────────────────────
+# 启用方法：把本文件复制为  .github/workflows/ci.yml  并推送。
+#   （直接推 .github/workflows/ 需要 Git 凭证带 `workflow` 权限；
+#     若命令行推送被拒，可在 GitHub 网页 → Add file → Create new file，
+#     路径填 .github/workflows/ci.yml，粘贴以下内容即可。）
+#
+# 作用：每次推送 main / PR 自动 npm ci && npm run build 校验，
+#       并把 dist/ 作为 Artifact 上传，下载解压即可传 OSS/COS/CloudBase/自建服务器。
+# ─────────────────────────────────────────────────────────────
+name: 构建校验与产物
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 安装 Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 构建（类型检查 + 打包）
+        run: npm run build
+
+      - name: 上传构建产物（下载后可直接部署到任意静态主机）
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+          retention-days: 30
+          if-no-files-found: error

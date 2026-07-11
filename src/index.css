@@ -6,10 +6,18 @@
   color-scheme: light;
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 html,
 body,
 #root {
   height: 100%;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 body {
@@ -26,6 +34,7 @@ body {
 
 /* 移动端优先：内容容器最大 480px 居中，桌面端也呈现「手机 App」外观 */
 .app-shell {
+  width: 100%;
   max-width: 480px;
   margin: 0 auto;
   min-height: 100%;
@@ -36,6 +45,7 @@ body {
   border-left: 1px solid rgba(148, 163, 184, 0.24);
   border-right: 1px solid rgba(148, 163, 184, 0.24);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.5), 0 24px 70px rgba(15, 23, 42, 0.08);
+  overflow-x: hidden;
 }
 
 .app-main {

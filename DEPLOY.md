@@ -27,7 +27,17 @@
 3. 环境变量按需填 `VITE_*`（见下）。推送即自动部署。
 > `*.pages.dev` 大陆访问偶有波动；追求最稳仍建议方案 A/B + 备案域名。
 
+### 方案 D · 自己的阿里云轻量应用服务器（Nginx，你当前的机器）
+2 核 2G / 200Mbps 跑这个纯静态站**绰绰有余**，几百人访问毫无压力。
+1. 构建 `dist/`：本地 `npm run build`，或直接从 **GitHub Actions 的 `dist` 产物**下载（见下）。
+2. 上传：`scp -r dist/* root@你的IP:/var/www/typhoon/`。
+3. 用仓库自带的 [`deploy/nginx.conf`](deploy/nginx.conf)（改 `server_name` 与 `root`）放到 `/etc/nginx/conf.d/`，`nginx -t && systemctl reload nginx`。
+4. HTTPS：`certbot --nginx -d 你的域名`（备案域名 + 443 是大陆正式对外前提）。
+> **应对大流量**：瓶颈是带宽不是这台机器 —— 前面挂一层**阿里云 CDN/DCDN** 缓存静态资源，回源压力几乎为零、全国更快，小机器也能扛大并发。也可把前端直接放 **OSS + CDN**，VM 只留给后端/AI 代理。
+
 **不推荐**：Vercel / GitHub Pages（`vercel.app` / `github.io` 大陆常需翻墙）。
+
+> 🤖 **可选 · 自动构建产物（GitHub Actions）**：仓库已附模板 [`deploy/github-actions.ci.yml`](deploy/github-actions.ci.yml)。把它复制为 `.github/workflows/ci.yml` 并推送（命令行推 workflow 需凭证带 `workflow` 权限，或直接在 GitHub 网页版新建该文件粘贴）即可启用：每次推送自动 `npm ci && npm run build` 校验，并把 `dist/` 作为 **Artifact** 上传；在 **Actions → 对应运行 → Artifacts** 下载 `dist.zip`，解压即可传到 OSS/COS/CloudBase/自建服务器，**无需本地装 Node**。
 
 ---
 
