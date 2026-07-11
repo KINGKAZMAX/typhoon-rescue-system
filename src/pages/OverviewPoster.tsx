@@ -267,7 +267,7 @@ export default function OverviewPoster() {
         </section>
 
         <footer className="overview-footer">
-          <div>开发者 小智 · wechat: KING_KAZMAX · mail: xinlise@gmail.com</div>
+          <div>具体需求和建议联系开发者 小智 · wechat: KING_KAZMAX · mail: xinlise@gmail.com</div>
           <div>公益信息聚合 · 数据以官方通报为准 · 生命危急请直接拨打 110 / 119 / 120</div>
         </footer>
       </section>

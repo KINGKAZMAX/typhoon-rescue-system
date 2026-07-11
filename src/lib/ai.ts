@@ -23,6 +23,7 @@ export interface NeedDraft {
     dialysis?: boolean
     oxygen?: boolean
     coldChain?: boolean
+    specialFood?: boolean // 需特殊医学用途配方食品（特食，如遗传代谢病）
   }
   uncertain?: string[] // AI 不确定/推测的字段，供前端高亮提示人工核对
 }

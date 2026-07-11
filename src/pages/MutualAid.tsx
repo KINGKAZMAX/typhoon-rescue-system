@@ -45,16 +45,16 @@ export default function MutualAid() {
   return (
     <div>
       {/* header 与二级 Tab 作为一个整体吸顶，避免硬编码偏移导致遮挡 */}
-      <div className="sticky top-0 z-30">
+      <div className="sticky top-0 z-30 shadow-header">
         <PageHeader icon={HeartHandshake} title="求助与互助" subtitle="拍照求助 · 物资安置 · 罕见病 · 志愿报名 · 捐赠" />
         {/* 二级 Tab（横向可滚动） */}
-        <div className="bg-white border-b border-slate-100 flex overflow-x-auto no-scrollbar">
+        <div className="bg-white/95 backdrop-blur-xl border-b border-slate-200/80 flex gap-2 overflow-x-auto no-scrollbar px-3 py-2">
           {TABS.map(([k, label]) => (
             <button
               key={k}
               onClick={() => setTab(k)}
-              className={`shrink-0 whitespace-nowrap px-4 py-3 text-sm font-medium border-b-2 transition ${
-                tab === k ? 'border-brand-600 text-brand-700' : 'border-transparent text-slate-400'
+              className={`shrink-0 whitespace-nowrap rounded-full px-3.5 py-2 text-sm font-semibold transition duration-150 ease-out active:scale-[0.98] ${
+                tab === k ? 'bg-brand-600 text-white shadow-action' : 'bg-slate-100 text-slate-500 active:bg-slate-200'
               }`}
             >
               {label}

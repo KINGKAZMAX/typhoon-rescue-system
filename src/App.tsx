@@ -16,7 +16,7 @@ export default function App() {
 
   return (
     <div className="app-shell">
-      <main className="pb-20 min-h-screen">
+      <main className="app-main">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/forecast" element={<Forecast />} />
@@ -25,8 +25,8 @@ export default function App() {
           <Route path="/guide" element={<Guide />} />
         </Routes>
         {/* 开发者联系方式（很小字体，全站常驻在内容最底部） */}
-        <footer className="px-4 pt-1 pb-3 text-center text-[10px] leading-relaxed text-slate-400">
-          开发者 小智 · 微信 KING_KAZMAX ·{' '}
+        <footer className="app-footer">
+          具体需求和建议联系开发者 小智 · 微信 KING_KAZMAX ·{' '}
           <a href="mailto:xinlise@gmail.com" className="underline decoration-slate-300">xinlise@gmail.com</a>
         </footer>
       </main>

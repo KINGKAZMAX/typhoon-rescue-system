@@ -33,6 +33,8 @@ export default {
         card: '0 1px 2px rgba(15,23,42,0.04), 0 1px 3px rgba(15,23,42,0.05)',
         soft: '0 6px 20px rgba(15,23,42,0.07)',
         header: '0 1px 0 rgba(15,23,42,0.06)',
+        action: '0 8px 18px rgba(37,89,235,0.16)',
+        danger: '0 8px 18px rgba(220,38,38,0.15)',
       },
       borderRadius: { xl: '0.875rem', '2xl': '1.125rem' },
     },

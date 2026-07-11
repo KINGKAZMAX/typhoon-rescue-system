@@ -11,7 +11,7 @@ export default function Rare() {
   return (
     <div className="space-y-4">
       <Disclaimer>
-        <Dna className="inline h-4 w-4 text-brand-600 mr-1 -mt-0.5" strokeWidth={2.25} />面向<b>罕见病/慢病患者家庭</b>的灾时"找钱/找药/找资源 + 用药/透析/供氧自救"。医疗要点源自 FDA/美CDC/NKF/中CDC，
+        <Dna className="inline h-4 w-4 text-brand-600 mr-1 -mt-0.5" strokeWidth={2.25} />面向<b>罕见病/慢病患者家庭</b>：先说清你现在最需要哪种<b>疾病相关支持——药物、医疗处置（透析/供氧/呼吸机），还是特殊医学配方食品（特食）</b>，其余不必多填。医疗要点源自 FDA/美CDC/NKF/中CDC，
         <b>剂量与个体化决策一律以主治医生为准</b>；危及生命立即拨 <b>120</b>。
       </Disclaimer>
 

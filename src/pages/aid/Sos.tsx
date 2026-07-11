@@ -15,7 +15,7 @@ const URGENCY = [
 ]
 
 const inputCls =
-  'w-full rounded-lg border border-slate-200 px-3 py-2 text-base focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white'
+  'field'
 
 function toggle<T>(arr: T[], v: T): T[] {
   return arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v]
@@ -37,7 +37,7 @@ export default function Sos({ onSubmitted }: { onSubmitted?: () => void }) {
   const [people, setPeople] = useState('')
   const [canMove, setCanMove] = useState('unknown')
   const [isRare, setIsRare] = useState(false)
-  const [rare, setRare] = useState({ disease: '', vitals: '', meds: '', dialysis: false, oxygen: false, coldChain: false })
+  const [rare, setRare] = useState({ disease: '', vitals: '', meds: '', dialysis: false, oxygen: false, coldChain: false, specialFood: false })
   const [contact, setContact] = useState({ name: '', phone: '' })
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState('')
@@ -73,6 +73,7 @@ export default function Sos({ onSubmitted }: { onSubmitted?: () => void }) {
             dialysis: d.rare!.dialysis ?? r.dialysis,
             oxygen: d.rare!.oxygen ?? r.oxygen,
             coldChain: d.rare!.coldChain ?? r.coldChain,
+            specialFood: d.rare!.specialFood ?? r.specialFood,
           }))
         }
       }
@@ -130,7 +131,7 @@ export default function Sos({ onSubmitted }: { onSubmitted?: () => void }) {
       if (rare.disease) r.push(`病种：${rare.disease}`)
       if (rare.vitals) r.push(`当前状态：${rare.vitals}`)
       if (rare.meds) r.push(`所需药物及剩余量：${rare.meds}`)
-      const dep = [rare.dialysis && '需透析', rare.oxygen && '需供氧', rare.coldChain && '有冷藏药'].filter(Boolean)
+      const dep = [rare.dialysis && '需透析', rare.oxygen && '需供氧', rare.specialFood && '需特殊医学配方食品(特食)', rare.coldChain && '有冷藏药'].filter(Boolean)
       if (dep.length) r.push(dep.join('、'))
       priv.push(r.join('；'))
     }
@@ -196,7 +197,7 @@ export default function Sos({ onSubmitted }: { onSubmitted?: () => void }) {
             <img key={i} src={src} className="w-20 h-20 object-cover rounded-lg border border-slate-200" />
           ))}
           {photos.length < 6 && (
-            <button onClick={() => fileRef.current?.click()} className="grid place-items-center w-20 h-20 rounded-lg border-2 border-dashed border-slate-300 text-slate-400">
+            <button onClick={() => fileRef.current?.click()} className="grid place-items-center w-20 h-20 rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 text-slate-400 transition active:bg-slate-100">
               <Plus className="h-7 w-7" strokeWidth={2.25} />
             </button>
           )}
@@ -311,7 +312,7 @@ export default function Sos({ onSubmitted }: { onSubmitted?: () => void }) {
           <div className="flex flex-wrap gap-2">
             {VULN_TAGS.map((t) => (
               <button key={t} onClick={() => setVuln((a) => toggle(a, t))}
-                className={`px-3 py-1.5 rounded-full text-sm border ${vuln.includes(t) ? 'bg-danger-500 text-white border-danger-500' : 'bg-white text-slate-600 border-slate-200'}`}>
+                className={`px-3 py-1.5 rounded-full text-sm font-semibold border transition active:scale-[0.98] ${vuln.includes(t) ? 'bg-danger-500 text-white border-danger-500' : 'bg-white text-slate-600 border-slate-200'}`}>
                 {t}
               </button>
             ))}
@@ -325,18 +326,18 @@ export default function Sos({ onSubmitted }: { onSubmitted?: () => void }) {
           <input type="checkbox" checked={isRare} onChange={(e) => setIsRare(e.target.checked)} className="w-4 h-4 accent-brand-600" />
           <span className="section-title">
             <span className="grid place-items-center h-5 w-5 rounded-full bg-brand-100 text-brand-700 text-xs font-semibold shrink-0">6</span>
-            <Dna className="h-4 w-4 text-brand-600" strokeWidth={2.25} />涉及罕见病 / 慢病患者（透析/胰岛素/供氧等）
+            <Dna className="h-4 w-4 text-brand-600" strokeWidth={2.25} />涉及罕见病 / 慢病患者（药物/透析/供氧/特食等）
           </span>
         </label>
         {isRare && (
           <div className="mt-3 space-y-2">
             <input className={inputCls} value={rare.disease} onChange={(e) => setRare({ ...rare, disease: e.target.value })} placeholder="病种（可拍药盒/病历代替打字）" />
             <input className={inputCls} value={rare.vitals} onChange={(e) => setRare({ ...rare, vitals: e.target.value })} placeholder="当前状态（意识/进食/抽搐/出血/呼吸/血糖等）" />
-            <input className={inputCls} value={rare.meds} onChange={(e) => setRare({ ...rare, meds: e.target.value })} placeholder="所需药物及剩余量 / 还能撑几天（最关键）" />
+            <input className={inputCls} value={rare.meds} onChange={(e) => setRare({ ...rare, meds: e.target.value })} placeholder="需要什么疾病相关支持：药物/特食名称及剩余量、还能撑几天（最关键）" />
             <div className="flex flex-wrap gap-2">
-              {([['dialysis', '需透析'], ['oxygen', '需供氧'], ['coldChain', '有冷藏药']] as const).map(([k, label]) => (
+              {([['dialysis', '需透析'], ['oxygen', '需供氧'], ['specialFood', '需特食'], ['coldChain', '有冷藏药']] as const).map(([k, label]) => (
                 <button key={k} onClick={() => setRare({ ...rare, [k]: !rare[k] })}
-                  className={`px-3 py-1.5 rounded-full text-sm border ${rare[k] ? 'bg-danger-600 text-white border-danger-600' : 'bg-white text-slate-600 border-slate-200'}`}>
+                  className={`px-3 py-1.5 rounded-full text-sm font-semibold border transition active:scale-[0.98] ${rare[k] ? 'bg-danger-600 text-white border-danger-600' : 'bg-white text-slate-600 border-slate-200'}`}>
                   {label}
                 </button>
               ))}

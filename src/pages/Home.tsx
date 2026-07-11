@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Wind, Phone, HeartHandshake, BookOpen, Camera, Siren, Megaphone, MapPin, ChevronRight, type LucideIcon } from 'lucide-react'
+import { Wind, Phone, HeartHandshake, BookOpen, Camera, Siren, Megaphone, MapPin, ChevronRight, LifeBuoy, ShieldCheck, type LucideIcon } from 'lucide-react'
 import { typhoon } from '../data/typhoon'
 import { emergencyLines } from '../data/phones'
 import { LAST_UPDATED } from '../lib/time'
@@ -21,50 +21,98 @@ export default function Home() {
   return (
     <div>
       {/* 顶部品牌区 */}
-      <header className="pt-safe bg-gradient-to-b from-brand-700 to-brand-600 text-white px-4 pt-4 pb-6 rounded-b-3xl">
-        <div className="flex items-center gap-2.5">
-          <span className="grid place-items-center h-9 w-9 rounded-xl bg-white/15">
-            <Wind className="h-5 w-5" strokeWidth={2.25} />
+      <header className="pt-safe bg-gradient-to-b from-brand-800 via-brand-700 to-brand-700 text-white px-4 pt-4 pb-6 rounded-b-[1.35rem] shadow-header">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="grid place-items-center h-10 w-10 rounded-xl bg-white/12 ring-1 ring-white/15 shrink-0">
+              <Wind className="h-5 w-5" strokeWidth={2.25} />
+            </span>
+            <div className="min-w-0">
+              <div className="text-[10px] font-semibold tracking-[0.16em] uppercase text-brand-100/90">广西应急信息服务</div>
+              <h1 className="text-xl font-bold tracking-tight leading-tight mt-0.5">广西台风救援平台</h1>
+            </div>
+          </div>
+          <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-white/12 px-2.5 py-1 text-[11px] font-semibold text-brand-50 ring-1 ring-white/15">
+            <ShieldCheck className="h-3.5 w-3.5" strokeWidth={2.25} />
+            公益聚合
           </span>
-          <h1 className="text-xl font-semibold tracking-tight">广西台风救援平台</h1>
         </div>
-        <p className="text-xs text-brand-100 mt-2">
+        <p className="text-xs text-brand-100 mt-3 leading-relaxed">
           整合官方预报 · 救援电话 · 民间互助 · 灾后重建 · 更新于 {LAST_UPDATED}
         </p>
+        <div className="mt-4 grid grid-cols-3 gap-2 text-[11px] font-semibold">
+          <span className="rounded-lg bg-white/10 px-2.5 py-2 text-center ring-1 ring-white/10">官方源优先</span>
+          <span className="rounded-lg bg-white/10 px-2.5 py-2 text-center ring-1 ring-white/10">一键拨号</span>
+          <span className="rounded-lg bg-white/10 px-2.5 py-2 text-center ring-1 ring-white/10">移动端优先</span>
+        </div>
       </header>
 
-      <div className="px-4 -mt-3.5 space-y-4">
+      <div className="px-4 -mt-3 space-y-4">
         {/* 台风状态横幅 */}
-        <Link to="/forecast" className="block card overflow-hidden">
-          <div className={`${levelStyle[typhoon.guangxiLevel]} text-white px-4 py-2 text-sm font-medium flex items-center justify-between`}>
+        <Link to="/forecast" className="block card interactive-card overflow-hidden">
+          <div className={`${levelStyle[typhoon.guangxiLevel]} text-white px-4 py-2 text-sm font-semibold flex items-center justify-between`}>
             <span className="flex items-center gap-1.5">
               <Megaphone className="h-4 w-4" strokeWidth={2.25} />
               广西台风态势
             </span>
-            <span className="flex items-center gap-0.5 text-xs opacity-90">查看详情<ChevronRight className="h-3.5 w-3.5" /></span>
+            <span className="flex items-center gap-0.5 text-xs opacity-95">查看详情<ChevronRight className="h-3.5 w-3.5" /></span>
           </div>
-          <div className="px-4 py-3">
-            <p className="text-sm text-slate-800 leading-relaxed">{typhoon.guangxiHeadline}</p>
+          <div className="px-4 py-3.5">
+            <p className="text-sm font-medium text-slate-800 leading-relaxed">{typhoon.guangxiHeadline}</p>
             <p className="text-xs text-slate-500 mt-2">
               当前活跃：{typhoon.current.name}（{typhoon.current.intlId}）· {typhoon.current.category} —— {typhoon.current.affects}
             </p>
           </div>
         </Link>
 
-        {/* 拍照求助大按钮 */}
-        <Link
-          to="/aid?tab=sos"
-          className="flex items-center gap-3 bg-danger-600 active:bg-danger-700 text-white rounded-2xl px-4 py-4 shadow-soft active:scale-[0.99] transition"
-        >
-          <span className="grid place-items-center h-11 w-11 rounded-xl bg-white/15 shrink-0">
-            <Camera className="h-6 w-6" strokeWidth={2} />
-          </span>
-          <div className="flex-1 min-w-0">
-            <div className="font-semibold text-lg leading-tight">拍照求助</div>
-            <div className="text-xs text-danger-100 mt-0.5">拍张照 · 说一句 · 方言也行 —— 帮你把求助送到救援方</div>
+        {/* 两种情况分流：正在受灾 / 灾后救助（按你的处境直达对应功能） */}
+        <section className="space-y-3">
+          <h2 className="section-title">你现在是哪种情况？按处境直达</h2>
+
+          {/* A. 正在受灾 · 紧急求救 */}
+          <div className="card p-4 border-l-4 border-danger-600">
+            <div className="flex items-center gap-2.5">
+              <span className="grid place-items-center h-10 w-10 rounded-lg bg-danger-50 text-danger-600 shrink-0">
+                <Siren className="h-5 w-5" strokeWidth={2.25} />
+              </span>
+              <div className="min-w-0">
+                <h3 className="font-bold text-slate-900 leading-tight">正在受灾 · 紧急求救</h3>
+                <p className="text-xs text-slate-500 mt-0.5">被困 / 受伤 / 断药 / 危房，需要立即救援</p>
+              </div>
+            </div>
+            <Link to="/aid?tab=sos" className="btn-danger w-full mt-3">
+              <Camera className="h-4 w-4" strokeWidth={2.25} />
+              拍照求助（一句话 / 方言也行）
+            </Link>
+            <div className="flex flex-wrap gap-2 mt-2.5">
+              <a href="tel:110" className="text-xs font-semibold px-3 py-1.5 rounded-full border border-danger-100 text-danger-700 bg-danger-50 active:bg-danger-100 transition">拨 110 报警</a>
+              <Link to="/aid?tab=safe" className="text-xs font-semibold px-3 py-1.5 rounded-full border border-slate-200 text-slate-600 bg-white active:bg-slate-50 transition">报平安 / 寻人</Link>
+              <Link to="/aid?tab=rare" className="text-xs font-semibold px-3 py-1.5 rounded-full border border-slate-200 text-slate-600 bg-white active:bg-slate-50 transition">断药 / 断透析 / 断氧</Link>
+            </div>
           </div>
-          <ChevronRight className="h-5 w-5 shrink-0" />
-        </Link>
+
+          {/* B. 已脱险 · 灾后救助与重建 */}
+          <div className="card p-4 border-l-4 border-brand-600">
+            <div className="flex items-center gap-2.5">
+              <span className="grid place-items-center h-10 w-10 rounded-lg bg-brand-50 text-brand-600 shrink-0">
+                <LifeBuoy className="h-5 w-5" strokeWidth={2.25} />
+              </span>
+              <div className="min-w-0">
+                <h3 className="font-bold text-slate-900 leading-tight">已脱险 · 灾后救助与重建</h3>
+                <p className="text-xs text-slate-500 mt-0.5">找安置/物资 · 报平安 · 罕见病用药/特食 · 重建理赔</p>
+              </div>
+            </div>
+            <Link to="/aid?tab=stations" className="btn-brand w-full mt-3">
+              <MapPin className="h-4 w-4" strokeWidth={2.25} />
+              找安置点 / 物资
+            </Link>
+            <div className="flex flex-wrap gap-2 mt-2.5">
+              <Link to="/guide" className="text-xs font-semibold px-3 py-1.5 rounded-full border border-slate-200 text-slate-600 bg-white active:bg-slate-50 transition">灾后安全指南</Link>
+              <Link to="/aid?tab=rare" className="text-xs font-semibold px-3 py-1.5 rounded-full border border-slate-200 text-slate-600 bg-white active:bg-slate-50 transition">罕见病 / 特食</Link>
+              <Link to="/aid?tab=donate" className="text-xs font-semibold px-3 py-1.5 rounded-full border border-slate-200 text-slate-600 bg-white active:bg-slate-50 transition">我要捐赠</Link>
+            </div>
+          </div>
+        </section>
 
         {/* 紧急拨号 */}
         <section>
@@ -77,7 +125,7 @@ export default function Home() {
               <a
                 key={e.number}
                 href={`tel:${e.number}`}
-                className="card flex flex-col items-center py-3.5 active:scale-[0.98] transition"
+                className="card interactive-card flex flex-col items-center py-3.5"
               >
                 <span className="text-2xl font-bold text-danger-600 tracking-tight">{e.number}</span>
                 <span className="text-xs text-slate-500 mt-1">{e.name}</span>
@@ -96,12 +144,15 @@ export default function Home() {
             {modules.map((m) => {
               const Icon = m.icon
               return (
-                <Link key={m.to} to={m.to} className="card p-4 active:scale-[0.98] transition">
-                  <span className={`grid place-items-center w-11 h-11 rounded-xl ${m.tint}`}>
-                    <Icon className="h-[22px] w-[22px]" strokeWidth={2} />
-                  </span>
-                  <h3 className="font-semibold text-slate-900 mt-2.5">{m.title}</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">{m.desc}</p>
+                <Link key={m.to} to={m.to} className="card interactive-card p-4">
+                  <div className="flex items-start justify-between gap-2">
+                    <span className={`grid place-items-center w-10 h-10 rounded-lg ${m.tint}`}>
+                      <Icon className="h-5 w-5" strokeWidth={2} />
+                    </span>
+                    <ChevronRight className="h-4 w-4 text-slate-300 mt-1" strokeWidth={2.25} />
+                  </div>
+                  <h3 className="font-bold text-slate-900 mt-3">{m.title}</h3>
+                  <p className="text-xs text-slate-500 mt-1 leading-snug">{m.desc}</p>
                 </Link>
               )
             })}
@@ -114,7 +165,7 @@ export default function Home() {
             <MapPin className="h-4 w-4 text-slate-500" strokeWidth={2.25} />
             近期灾情速览
           </h2>
-          <Link to="/forecast" className="block card p-4">
+          <Link to="/forecast" className="block card interactive-card p-4">
             <div className="flex items-center justify-between">
               <span className="font-semibold text-slate-900">
                 台风"{typhoon.recentImpact.name}"（{typhoon.recentImpact.intlId}）
@@ -123,7 +174,7 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-2 gap-2 mt-3">
               {typhoon.recentImpact.stats.slice(0, 4).map((s) => (
-                <div key={s.label} className="bg-slate-50 rounded-xl px-3 py-2">
+                <div key={s.label} className="official-band rounded-lg px-3 py-2">
                   <div className="text-[11px] text-slate-500">{s.label}</div>
                   <div className="text-sm font-semibold text-slate-900">{s.value}</div>
                 </div>
